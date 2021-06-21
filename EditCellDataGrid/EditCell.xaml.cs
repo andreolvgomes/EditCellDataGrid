@@ -20,6 +20,7 @@ namespace EditCellDataGrid
     {
         public bool Success { get; set; }
         public string Value { get; set; }
+        public bool Changes { get; set; }
     }
 
     public enum TypeInput
@@ -34,7 +35,7 @@ namespace EditCellDataGrid
         private bool success = false;
         private readonly DataGridTextColumn _column;
         private readonly object _oldText;
-        private TextBox textbox = null;
+        private readonly TextBox textbox = null;
 
         public EditCell(Window owner, string value, TypeInput typeInput, DataGridTextColumn column, Type typeColumn)
         {
@@ -86,7 +87,8 @@ namespace EditCellDataGrid
             return new Result()
             {
                 Success = success,
-                Value = textbox.Text
+                Value = textbox.Text,
+                Changes = !textbox.Equals(_oldText)
             };
         }
 
