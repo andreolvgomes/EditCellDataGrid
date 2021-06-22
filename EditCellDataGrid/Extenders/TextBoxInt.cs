@@ -67,7 +67,7 @@ namespace EditCellDataGrid.Extenders
                 if (this.ValidaValorMaximo(_text))
                 {
                     if (this.MaxLength > 0)
-                        this.Text = _text.SubstringBetter(0, this.MaxLength);
+                        this.Text = _text.SubstringBest(0, this.MaxLength);
                     else
                         this.Text = _text;
                     this.SelectionStart = (_selectionStart == 0) ? this.Text.Length : _selectionStart;

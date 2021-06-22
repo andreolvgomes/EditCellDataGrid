@@ -93,10 +93,10 @@ namespace EditCellDataGrid
         /// <returns></returns>
         private bool DataGridTextColumn_ValidationEdit(object sender, EditCellEventArgs e)
         {
-            if (e.NewValue is null || e.NewValue.ToString().NullOrEmpty())
+            if (e.NewValue is null || e.NewValue.ToString().CheckNullOrEmpty())
                 return Message("Informe o nome Id");
 
-            var checkout = items.FirstOrDefault(c => c.Id == e.NewValue.ToString().ToInt16());
+            var checkout = items.FirstOrDefault(c => c.Id == e.NewValue.ToString().CastToInt16());
             if (checkout == null)
                 return true;
             return Message("Id já existe na lista");

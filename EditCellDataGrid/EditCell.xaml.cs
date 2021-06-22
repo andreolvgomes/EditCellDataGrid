@@ -59,6 +59,7 @@ namespace EditCellDataGrid
                 textbox = new TextBoxInt();
             }
 
+            textbox.Name = "txtEdit";
             textbox.PreviewKeyDown += new KeyEventHandler(textbox_PreviewKeyDown);
             stkTextBox.Children.Add(textbox);
 
@@ -71,7 +72,7 @@ namespace EditCellDataGrid
             if (typeInput == TypeInput.KeyboardDevice)
                 textbox.SelectionStart = value.Length;
             else
-                textbox.FocusSelectAll();
+                textbox.DefineFocusSelectAll();
 
             PreviewKeyDown += new KeyEventHandler(W_PreviewKeyDown);
         }
@@ -104,7 +105,11 @@ namespace EditCellDataGrid
 
         private void Ok()
         {
-            if (Valid())
+            if (Valid() == false)
+            {
+                textbox.DefineFocusSelectAll();
+            }
+            else
             {
                 success = true;
                 Close();

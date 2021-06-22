@@ -78,7 +78,7 @@ namespace EditCellDataGrid.Extenders
             if (string.IsNullOrEmpty(Text))
                 Text = "0,00";
 
-            if (!this.Text.IsDecimal())
+            if (!this.Text.CheckDecimal())
                 this.Text = "0," + "0".PadRight(this.QuantityDecimais, '0');
             else
                 this.Text = (Convert.ToDecimal(this.Text)).ToString(string.Format("0.{0}", "".PadRight(this.QuantityDecimais, '0'))).Replace(".", "");

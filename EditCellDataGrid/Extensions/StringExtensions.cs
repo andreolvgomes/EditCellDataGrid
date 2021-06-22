@@ -2,17 +2,17 @@
 {
     public static class StringExtensions
     {
-        public static bool NullOrEmpty(this string str)
+        public static bool CheckNullOrEmpty(this string str)
         {
             return string.IsNullOrEmpty(str);
         }
 
-        public static string SubstringBetter(this string str, int startIndex, int length)
+        public static string SubstringBest(this string str, int startIndex, int length)
         {
             if (string.IsNullOrEmpty(str)) return "";
 
             if (startIndex < 0)
-                return str.SubstringBetter(0, length);
+                return str.SubstringBest(0, length);
 
             if (startIndex > str.Length)
                 return "";

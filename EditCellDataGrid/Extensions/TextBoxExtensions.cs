@@ -9,7 +9,7 @@ namespace System
 {
     public static class TextBoxExtensions
     {
-        public static bool FocusSelectAll(this TextBox textbox)
+        public static bool DefineFocusSelectAll(this TextBox textbox)
         {
             textbox.Focus();
             textbox.SelectAll();

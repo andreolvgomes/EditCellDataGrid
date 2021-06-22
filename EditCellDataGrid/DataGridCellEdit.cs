@@ -18,7 +18,7 @@ namespace EditCellDataGrid
         public void BeginEdit(DataGrid dataGrid, bool defineCellStyle = true)
         {
             if (_beginEdit == true)
-                throw new Exception("_beginEdit = True");
+                throw new Exception("Execute BeginEdit just once");
 
             if (defineCellStyle)
                 DefineCellStyle(dataGrid);
@@ -84,16 +84,16 @@ namespace EditCellDataGrid
 
         public bool OnDefineNewValue(DataGridTextColumn column, Result result)
         {
-            if (column == null) return true;
+            if (column == null) return false;
 
             Type type = column.GetType();
 
             var field = type.GetField("DefineNewValue", BindingFlags.NonPublic | BindingFlags.Instance);
-            if (field == null) return true;
+            if (field == null) return false;
 
             var eventDelegate = field.GetValue(column) as MulticastDelegate;
             if (eventDelegate == null)
-                return true;
+                return false;
 
             var events = eventDelegate.GetInvocationList();
             if (events.Length == 0)
