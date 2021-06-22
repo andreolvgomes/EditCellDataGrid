@@ -1,5 +1,4 @@
-﻿using EditCellDataGrid.Edit;
-using EditCellDataGrid.Extenders;
+﻿using EditCellDataGrid.EventsArgs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -22,14 +21,37 @@ using System.Windows.Shapes;
 
 namespace EditCellDataGrid
 {
-    public class Produto
+    public class Produto : INotifyPropertyChanged
     {
         public int Id { get; set; }
         public string Description { get; set; }
-        public decimal Price { get; set; }
+
+        private decimal _Price;
+
+        public decimal Price
+        {
+            get { return _Price; }
+            set
+            {
+                if (_Price != value)
+                {
+                    _Price = value;
+                    OnPropertyChanged("Price");
+                }
+            }
+        }
+
         public decimal Quantity { get; set; }
         public decimal Total { get; set; }
         public DateTime Date { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnPropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 
     public partial class MainWindow : Window
@@ -60,7 +82,7 @@ namespace EditCellDataGrid
             dgv.ItemsSource = new List<Produto>();
             dgv.ItemsSource = items;
 
-            DataGridCellEdit.BeginEdit(dgv);
+            new DataGridCellEdit<Produto>().BeginEdit(dgv);
         }
 
         /// <summary>
@@ -69,7 +91,7 @@ namespace EditCellDataGrid
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <returns></returns>
-        private bool DataGridTextColumnValidation_ValidationEdit(object sender, EditCellEventArgs e)
+        private bool DataGridTextColumn_ValidationEdit(object sender, EditCellEventArgs e)
         {
             if (e.NewValue is null || e.NewValue.ToString().NullOrEmpty())
                 return Message("Informe o nome Id");
@@ -78,6 +100,12 @@ namespace EditCellDataGrid
             if (checkout == null)
                 return true;
             return Message("Id já existe na lista");
+        }        
+
+        private void DataGridTextColumnEditCell_DefineNewValue(object sender, Result result)
+        {
+            var item = dgv.SelectedItem as Produto;
+            item.Price = Convert.ToDecimal(result.Value);
         }
 
         private bool Message(string message, MessageBoxImage messageBoxImage = MessageBoxImage.Information)

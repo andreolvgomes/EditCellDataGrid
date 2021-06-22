@@ -1,5 +1,4 @@
-﻿using EditCellDataGrid.Extenders;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -7,24 +6,32 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
-namespace EditCellDataGrid.Edit
+namespace EditCellDataGrid
 {
-    public class DataGridCellEdit
+    public class DataGridCellEdit<T> where T : class, new()
     {
-        public static void BeginEdit(DataGrid dataGrid, bool defineCellStyle = true)
+        private bool _beginEdit = false;
+
+        public void BeginEdit(DataGrid dataGrid, bool defineCellStyle = true)
         {
+            if (_beginEdit == true)
+                throw new Exception("_beginEdit = True");
+
             if (defineCellStyle)
                 DefineCellStyle(dataGrid);
-            dataGrid.BeginningEdit += new EventHandler<DataGridBeginningEditEventArgs>(BeginningEdit);
+            dataGrid.BeginningEdit += new EventHandler<DataGridBeginningEditEventArgs>(OnBeginningEdit);
+            _beginEdit = true;
         }
 
-        private static void BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
+        private void OnBeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
             e.Cancel = true;
 
             var dataGrid = sender as DataGrid;
+            var selectedItem = dataGrid.SelectedItem;
 
             var selectedRow = dataGrid.GetSelectedRow();
             var selectedCell = dataGrid.GetCell(selectedRow, dataGrid.CurrentColumn.DisplayIndex);
@@ -62,18 +69,49 @@ namespace EditCellDataGrid.Edit
             var result = view.Get();
             if (result.Success)
             {
-                textBlock.Text = result.Value;
-
-                var selecteObj = dataGrid.SelectedItem;
-                property.SetValue(selecteObj, Get(property.PropertyType, result.Value));
+                if (OnDefineNewValue(e.Column as DataGridTextColumn, result) == false)
+                {
+                    textBlock.Text = result.Value;
+                    property.SetValue(selectedItem, Get(property.PropertyType, result.Value));
+                }
             }
+
+            // define focus
+            selectedCell.Focus();
+            selectedRow.Focus();
+            selectedRow.IsSelected = true;
+        }
+
+        public bool OnDefineNewValue(DataGridTextColumn column, Result result)
+        {
+            if (column == null) return true;
+
+            Type type = column.GetType();
+
+            var field = type.GetField("DefineNewValue", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (field == null) return true;
+
+            var eventDelegate = field.GetValue(column) as MulticastDelegate;
+            if (eventDelegate == null)
+                return true;
+
+            var events = eventDelegate.GetInvocationList();
+            if (events.Length == 0)
+                return false;
+
+            foreach (var eventHandler in events)
+            {
+                eventHandler.Method.Invoke(
+                        eventHandler.Target, new object[] { column, result });
+            }
+            return true;
         }
 
         /// <summary>
         /// Define color Read for Cell that can edit
         /// </summary>
         /// <param name="dataGrid"></param>
-        private static void DefineCellStyle(DataGrid dataGrid)
+        private void DefineCellStyle(DataGrid dataGrid)
         {
             MultiTrigger multiTrigger = new MultiTrigger();
 
@@ -99,7 +137,7 @@ namespace EditCellDataGrid.Edit
         /// <param name="selectedCell"></param>
         /// <param name="selectedRow"></param>
         /// <param name="view"></param>
-        private static void DefinePosition(DataGridCell selectedCell, DataGridRow selectedRow, Window view)
+        private void DefinePosition(DataGridCell selectedCell, DataGridRow selectedRow, Window view)
         {
             var screenCoordinates = selectedCell.PointToScreen(new Point(0, 0));
             view.Width = selectedCell.ActualWidth + 20;
@@ -115,7 +153,7 @@ namespace EditCellDataGrid.Edit
         /// <param name="type"></param>
         /// <param name="str"></param>
         /// <returns></returns>
-        private static object Get(Type type, string str)
+        private object Get(Type type, string str)
         {
             System.ComponentModel.TypeConverter converter = System.ComponentModel.TypeDescriptor.GetConverter(type);
             return converter.ConvertFrom(str);
@@ -127,15 +165,14 @@ namespace EditCellDataGrid.Edit
         /// <param name="dataGrid"></param>
         /// <param name="e"></param>
         /// <returns></returns>
-        private static PropertyInfo GetProperty(DataGrid dataGrid, DataGridBeginningEditEventArgs e)
+        private PropertyInfo GetProperty(DataGrid dataGrid, DataGridBeginningEditEventArgs e)
         {
             var binding = ((System.Windows.Controls.DataGridBoundColumn)e.Column).Binding;
             if (binding == null)
                 throw new Exception($"'{e.Column.Header}'... binding is null, not allowed.. define IsReadOnly=True");
 
             var path = ((System.Windows.Data.Binding)binding).Path.Path;
-            var selecteObj = dataGrid.SelectedItem as Produto;
-            var property = selecteObj.GetType().GetProperty(path);
+            var property = dataGrid.SelectedItem.GetType().GetProperty(path);
             return property;
         }
     }

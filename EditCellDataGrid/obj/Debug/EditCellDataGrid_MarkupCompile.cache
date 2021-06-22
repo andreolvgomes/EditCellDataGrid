@@ -1,7 +1,7 @@
 ﻿EditCellDataGrid
 
 
-winexe
+library
 C#
 .cs
 C:\Users\André\source\repos\EditCellDataGrid\EditCellDataGrid\obj\Debug\
@@ -9,12 +9,12 @@ EditCellDataGrid
 none
 false
 DEBUG;TRACE
-C:\Users\André\source\repos\EditCellDataGrid\EditCellDataGrid\App.xaml
-21123453489
 
-162074051808
-15767094614
-EditCell.xaml;MainWindow.xaml;
+1-28094636
+
+17-1059707868
+151270957945
+EditCell.xaml;
 
 False
 

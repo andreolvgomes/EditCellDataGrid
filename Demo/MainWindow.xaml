@@ -1,12 +1,9 @@
 ﻿<Window x:Class="EditCellDataGrid.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:extenders="clr-namespace:EditCellDataGrid.Extenders"
+        xmlns:extenders="clr-namespace:EditCellDataGrid.Extenders;assembly=EditCellDataGrid"
         Title="MainWindow" Height="600" Width="800" WindowStartupLocation="CenterScreen"
         >
-
-    <Window.Resources>
-    </Window.Resources>
 
     <Grid Margin="5">
         <Grid.RowDefinitions>
@@ -23,13 +20,13 @@
 
         <DataGrid x:Name="dgv" Grid.Row="1" Background="White" AutoGenerateColumns="False" IsReadOnly="False">
             <DataGrid.Columns>
-                <extenders:DataGridTextColumnEditCellValidation Header="Código" Binding="{Binding Id}" Validation="DataGridTextColumnValidation_ValidationEdit"/>
-                <extenders:DataGridTextColumnEditCellValidation Header="Descrição" Width="*" Binding="{Binding Description}" IsReadOnly="True"/>
-                <extenders:DataGridTextColumnEditCellValidation Header="Preço" Binding="{Binding Price, StringFormat={}{0:n2}, ConverterCulture=pt-br}" Width="100"/>
-                <extenders:DataGridTextColumnEditCellValidation Header="Quantity" Binding="{Binding Quantity, StringFormat={}{0:n2}, ConverterCulture=pt-br}" Width="100"/>
-                <extenders:DataGridTextColumnEditCellValidation Header="Total" Binding="{Binding Total, StringFormat={}{0:n2}, ConverterCulture=pt-br}" Width="100"/>
-                <extenders:DataGridTextColumnEditCellValidation Header="Sem Binding(Error)" Width="100"/>
-                <extenders:DataGridTextColumnEditCellValidation Header="Data" Binding="{Binding Date, StringFormat={}{0:dd/MM/yyyy}, ConverterCulture=pt-br}" Width="100"/>
+                <extenders:DataGridTextColumnEditCell Header="Código" Binding="{Binding Id}" Validation="DataGridTextColumn_ValidationEdit"/>
+                <extenders:DataGridTextColumnEditCell Header="Descrição" Width="*" Binding="{Binding Description}" IsReadOnly="True"/>
+                <extenders:DataGridTextColumnEditCell Header="Preço" Binding="{Binding Price, StringFormat={}{0:n2}, ConverterCulture=pt-br}" Width="100" DefineNewValue="DataGridTextColumnEditCell_DefineNewValue"/>
+                <extenders:DataGridTextColumnEditCell Header="Quantity" Binding="{Binding Quantity, StringFormat={}{0:n2}, ConverterCulture=pt-br}" Width="100"/>
+                <extenders:DataGridTextColumnEditCell Header="Total" Binding="{Binding Total, StringFormat={}{0:n2}, ConverterCulture=pt-br}" Width="100"/>
+                <extenders:DataGridTextColumnEditCell Header="Sem Binding(Error)" Width="100"/>
+                <extenders:DataGridTextColumnEditCell Header="Data" Binding="{Binding Date, StringFormat={}{0:dd/MM/yyyy}, ConverterCulture=pt-br}" Width="100"/>
                 <DataGridTextColumn Header="Sem Validação" Binding="{Binding Date, StringFormat={}{0:dd/MM/yyyy}, ConverterCulture=pt-br}" Width="100"/>
             </DataGrid.Columns>
         </DataGrid>

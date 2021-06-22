@@ -1,4 +1,5 @@
-﻿using EditCellDataGrid.Extenders;
+﻿using EditCellDataGrid.EventsArgs;
+using EditCellDataGrid.Extenders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -95,7 +96,10 @@ namespace EditCellDataGrid
         private void textbox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
+            {
+                e.Handled = true;
                 Ok();
+            }
         }
 
         private void Ok()
