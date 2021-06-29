@@ -19,7 +19,7 @@ Mudar o Id 4 para 1
 	<img src="Assets/celledit-validation.PNG">
 </p>
 
-## Definir na propriedade da classe o novo dado
+## Definir novo Dado na propriedade da classe
 Por padrão, ao concluir edição com "Enter", a biblioteca já se encarrega de fazer a mudança na propriedade da classe. Mas, se por algum motivo seja necessário aplicar alguma 
 lógica ao confirmar o novo dado, por exemplo: recalcular valores com base no novo dado... Nesse caso é só usar a **DataGridTextColumnEditCell** e usar o evento **DefineNewValue**.
 Usando o evento, a biblioteca deixa de fazer o processo automático e delega para o método anexado ao evento.
