@@ -10,3 +10,15 @@ C:\Users\André\source\repos\EditCellDataGrid\EditCellDataGrid\obj\Debug\EditCel
 C:\Users\André\source\repos\EditCellDataGrid\EditCellDataGrid\obj\Debug\EditCell.g.cs
 C:\Users\André\source\repos\EditCellDataGrid\EditCellDataGrid\bin\Debug\EditCellDataGrid.dll
 C:\Users\André\source\repos\EditCellDataGrid\EditCellDataGrid\obj\Debug\EditCellDataGrid.dll
+C:\EditCellDataGrid\EditCellDataGrid\bin\Debug\EditCellDataGrid.dll
+C:\EditCellDataGrid\EditCellDataGrid\bin\Debug\EditCellDataGrid.pdb
+C:\EditCellDataGrid\EditCellDataGrid\obj\Debug\EditCellDataGrid.csproj.AssemblyReference.cache
+C:\EditCellDataGrid\EditCellDataGrid\obj\Debug\EditCell.baml
+C:\EditCellDataGrid\EditCellDataGrid\obj\Debug\EditCell.g.cs
+C:\EditCellDataGrid\EditCellDataGrid\obj\Debug\EditCellDataGrid_MarkupCompile.cache
+C:\EditCellDataGrid\EditCellDataGrid\obj\Debug\EditCellDataGrid.g.resources
+C:\EditCellDataGrid\EditCellDataGrid\obj\Debug\EditCellDataGrid.Properties.Resources.resources
+C:\EditCellDataGrid\EditCellDataGrid\obj\Debug\EditCellDataGrid.csproj.GenerateResource.cache
+C:\EditCellDataGrid\EditCellDataGrid\obj\Debug\EditCellDataGrid.csproj.CoreCompileInputs.cache
+C:\EditCellDataGrid\EditCellDataGrid\obj\Debug\EditCellDataGrid.dll
+C:\EditCellDataGrid\EditCellDataGrid\obj\Debug\EditCellDataGrid.pdb

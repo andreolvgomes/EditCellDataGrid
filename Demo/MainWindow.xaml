@@ -12,7 +12,7 @@
         </Grid.RowDefinitions>
 
         <StackPanel>
-            <TextBlock Text="Formas nativa para editar Grid:" Foreground="DarkRed"/>
+            <TextBlock Text="Formas nativas para editar Grid:" Foreground="DarkRed"/>
             <TextBlock Text="   - F2 na célula desejada" Foreground="DarkBlue"/>
             <TextBlock Text="   - Clique na célula que já tem o foco" Foreground="DarkBlue"/>
             <TextBlock Text="   - Digitar novo valor na célula" Foreground="DarkBlue"/>
@@ -21,12 +21,12 @@
         <DataGrid x:Name="dgv" Grid.Row="1" Background="White" AutoGenerateColumns="False" IsReadOnly="False">
             <DataGrid.Columns>
                 <extenders:DataGridTextColumnEditCell Header="Código" Binding="{Binding Id}" Validation="DataGridTextColumn_ValidationEdit"/>
-                <extenders:DataGridTextColumnEditCell Header="Descrição" Width="*" Binding="{Binding Description}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Descrição" Width="*" Binding="{Binding Description}" IsReadOnly="True"/>
                 <extenders:DataGridTextColumnEditCell Header="Preço" Binding="{Binding Price, StringFormat={}{0:n2}, ConverterCulture=pt-br}" Width="100" DefineNewValue="DataGridTextColumnEditCell_DefineNewValue"/>
-                <extenders:DataGridTextColumnEditCell Header="Quantity" Binding="{Binding Quantity, StringFormat={}{0:n2}, ConverterCulture=pt-br}" Width="100"/>
-                <extenders:DataGridTextColumnEditCell Header="Total" Binding="{Binding Total, StringFormat={}{0:n2}, ConverterCulture=pt-br}" Width="100"/>
-                <extenders:DataGridTextColumnEditCell Header="Sem Binding(Error)" Width="100"/>
-                <extenders:DataGridTextColumnEditCell Header="Data" Binding="{Binding Date, StringFormat={}{0:dd/MM/yyyy}, ConverterCulture=pt-br}" Width="100"/>
+                <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity, StringFormat={}{0:n2}, ConverterCulture=pt-br}" Width="100"/>
+                <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat={}{0:n2}, ConverterCulture=pt-br}" Width="100"/>
+                <DataGridTextColumn Header="Sem Binding(Error)" Width="100"/>
+                <DataGridTextColumn Header="Data" Binding="{Binding Date, StringFormat={}{0:dd/MM/yyyy}, ConverterCulture=pt-br}" Width="100"/>
                 <DataGridTextColumn Header="Sem Validação" Binding="{Binding Date, StringFormat={}{0:dd/MM/yyyy}, ConverterCulture=pt-br}" Width="100"/>
             </DataGrid.Columns>
         </DataGrid>
