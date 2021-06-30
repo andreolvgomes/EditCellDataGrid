@@ -5,12 +5,13 @@ setar o novo dado confirmado pelo usuário, ter o textbox de edição formatado 
 
 • Para tornar o DataGrid editável basta definir **IsReadOnly="False"**. Para bloquear as colunas que não podem ser editáveis, é só definir uma a uma como **IsReadOnly="True"**
 
+No construtor da Window, execute, por exemplo: **new DataGridCellEdit<Produto>().BeginEdit(datagrid);**
 <p>
 	<img src="Assets/celledit-field.PNG">
 </p>
 
 ## Validação personalizada
-Para valida o dado antes de sobrescrever o dado antigo, basta usar a **DataGridTextColumnEditCell** e usar o evento **Validation**. Dessa forma é possível adiciona a lógica da 
+Para validar o dado antes de sobrescrever o dado antigo, basta usar a **DataGridTextColumnEditCell** e usar o evento **Validation**. Dessa forma é possível adiciona a lógica da 
 validação para cada uma das colunas(campo).
 
 ### Exemplo:
