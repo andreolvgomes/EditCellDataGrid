@@ -51,7 +51,12 @@ namespace System
         {
             if (row != null)
             {
-                DataGridCellsPresenter presenter = GetVisualChild<DataGridCellsPresenter>(row);
+                var cellInfo = dataGrid1.SelectedCells[column];
+                var result = GetCell(dataGrid1, row, cellInfo.Item);
+                if (result != null)
+                    return result;
+
+                var presenter = GetVisualChild<DataGridCellsPresenter>(row);
 
                 if (presenter == null)
                 {
@@ -59,8 +64,22 @@ namespace System
                     presenter = GetVisualChild<DataGridCellsPresenter>(row);
                 }
 
-                DataGridCell cell = (DataGridCell)presenter.ItemContainerGenerator.ContainerFromIndex(column);
+                var cell = (DataGridCell)presenter.ItemContainerGenerator.ContainerFromIndex(column);
 
+                return cell;
+            }
+            return null;
+        }
+
+        private static DataGridCell GetCell(this DataGrid dataGrid1, DataGridRow row, object column)
+        {
+            if (row != null)
+            {
+                var presenter = GetVisualChild<DataGridCellsPresenter>(row);
+                if (presenter == null)
+                    return null;
+
+                var cell = (DataGridCell)presenter.ItemContainerGenerator.ContainerFromItem(column);
                 return cell;
             }
             return null;

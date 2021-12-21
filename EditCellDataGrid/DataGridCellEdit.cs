@@ -35,7 +35,7 @@ namespace EditCellDataGrid
 
             var selectedRow = dataGrid.GetSelectedRow();
             var selectedCell = dataGrid.GetCell(selectedRow, dataGrid.CurrentColumn.DisplayIndex);
-
+            
             var textBlock = (selectedCell.Content as TextBlock);
             var value = textBlock.Text;
             var typeInput = TypeInput.F2Native;

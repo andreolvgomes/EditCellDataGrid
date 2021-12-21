@@ -18,7 +18,8 @@
             <TextBlock Text="   - Digitar novo valor na célula" Foreground="DarkBlue"/>
         </StackPanel>
 
-        <DataGrid x:Name="dgv" Grid.Row="1" Background="White" AutoGenerateColumns="False" IsReadOnly="False">
+        <DataGrid x:Name="dgv" Grid.Row="1" Background="White" AutoGenerateColumns="False" IsReadOnly="False"
+                  CanUserReorderColumns="True">
             <DataGrid.Columns>
                 <extenders:DataGridTextColumnEditCell Header="Código" Binding="{Binding Id}" Validation="DataGridTextColumn_ValidationEdit"/>
                 <DataGridTextColumn Header="Descrição" Width="*" Binding="{Binding Description}" IsReadOnly="True"/>
