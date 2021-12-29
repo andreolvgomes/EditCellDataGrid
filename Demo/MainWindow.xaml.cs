@@ -113,5 +113,13 @@ namespace EditCellDataGrid
             MessageBox.Show(message, "Atenção", MessageBoxButton.OK, messageBoxImage);
             return false;
         }
+
+        private void DataGridTextColumnEditCell_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.F2)
+            {
+                MessageBox.Show("Abra sua consulta aqui", "Atenção");
+            }
+        }
     }
 }

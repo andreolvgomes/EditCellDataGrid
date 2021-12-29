@@ -36,7 +36,7 @@ namespace EditCellDataGrid
         private bool success = false;
         private readonly DataGridTextColumn _column;
         private readonly object _oldText;
-        private readonly TextBox textbox = null;
+        public readonly TextBox textbox = null;
 
         public EditCell(Window owner, string value, TypeInput typeInput, DataGridTextColumn column, Type typeColumn)
         {

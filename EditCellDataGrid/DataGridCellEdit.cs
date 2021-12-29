@@ -62,6 +62,8 @@ namespace EditCellDataGrid
 
             var property = GetProperty(dataGrid, e);
             var view = new EditCell(Window.GetWindow(dataGrid), value, typeInput, e.Column as DataGridTextColumn, property.PropertyType);
+            _column = e.Column as DataGridTextColumn;
+            view.textbox.PreviewKeyDown += FieldPreviewKeyDown;
             view.lblRotulo.Text = e.Column.Header.ToString();
 
             DefinePosition(selectedCell, selectedRow, view);
@@ -81,6 +83,38 @@ namespace EditCellDataGrid
             selectedRow.Focus();
             selectedRow.IsSelected = true;
         }
+
+        private void FieldPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            OnPreviewKeyDown(sender, e);
+        }
+
+        public bool OnPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (_column == null) return false;
+
+            Type type = _column.GetType();
+
+            var field = type.GetField("PreviewKeyDown", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (field == null) return false;
+
+            var eventDelegate = field.GetValue(_column) as MulticastDelegate;
+            if (eventDelegate == null)
+                return false;
+
+            var events = eventDelegate.GetInvocationList();
+            if (events.Length == 0)
+                return false;
+
+            foreach (var eventHandler in events)
+            {
+                eventHandler.Method.Invoke(
+                        eventHandler.Target, new object[] { sender, e });
+            }
+            return true;
+        }
+
+        private DataGridTextColumn _column;
 
         public bool OnDefineNewValue(DataGridTextColumn column, Result result)
         {

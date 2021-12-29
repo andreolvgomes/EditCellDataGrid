@@ -21,9 +21,10 @@
         <DataGrid x:Name="dgv" Grid.Row="1" Background="White" AutoGenerateColumns="False" IsReadOnly="False"
                   CanUserReorderColumns="True">
             <DataGrid.Columns>
-                <extenders:DataGridTextColumnEditCell Header="Código" Binding="{Binding Id}" Validation="DataGridTextColumn_ValidationEdit"/>
+                <extenders:DataGridTextColumnEditCell Header="Código" Binding="{Binding Id}" Validation="DataGridTextColumn_ValidationEdit" PreviewKeyDown="DataGridTextColumnEditCell_PreviewKeyDown"/>
                 <DataGridTextColumn Header="Descrição" Width="*" Binding="{Binding Description}" IsReadOnly="True"/>
-                <extenders:DataGridTextColumnEditCell Header="Preço" Binding="{Binding Price, StringFormat={}{0:n2}, ConverterCulture=pt-br}" Width="100" DefineNewValue="DataGridTextColumnEditCell_DefineNewValue"/>
+                <extenders:DataGridTextColumnEditCell Header="Preço" Binding="{Binding Price, StringFormat={}{0:n2}, ConverterCulture=pt-br}"
+                                                     Width="100" DefineNewValue="DataGridTextColumnEditCell_DefineNewValue"/>
                 <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity, StringFormat={}{0:n2}, ConverterCulture=pt-br}" Width="100"/>
                 <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat={}{0:n2}, ConverterCulture=pt-br}" Width="100"/>
                 <DataGridTextColumn Header="Sem Binding(Error)" Width="100"/>
