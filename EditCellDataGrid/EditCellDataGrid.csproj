@@ -61,6 +61,8 @@
     <Compile Include="Delegates\DefineNewValueEventHandler.cs" />
     <Compile Include="DataGridCellEdit.cs" />
     <Compile Include="EventsArgs\EditCellEventArgs.cs" />
+    <Compile Include="Extenders\TextBoxMask.cs" />
+    <Compile Include="Extensions\DataGridExtensions.cs" />
     <Compile Include="Extenders\TextBoxDate.cs" />
     <Compile Include="Extenders\TextBoxInt.cs" />
     <Compile Include="Extensions\DecimalExtensions.cs" />
@@ -76,7 +78,7 @@
     <Compile Include="EditCell.xaml.cs">
       <DependentUpon>EditCell.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Extenders\DataGridTextColumnEditCell.cs" />
+    <Compile Include="Extenders\TextColumnEdit.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

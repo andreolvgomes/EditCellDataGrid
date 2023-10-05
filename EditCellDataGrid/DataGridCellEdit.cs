@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Reflection;
+using System.Windows;
+using System;
+using EditCellDataGrid.Extenders;
 
 namespace EditCellDataGrid
 {
@@ -20,8 +17,12 @@ namespace EditCellDataGrid
             if (_beginEdit == true)
                 throw new Exception("Execute BeginEdit just once");
 
+            if (dataGrid.IsReadOnly)
+                throw new Exception("DataGrid IsReadOnly=true, define IsReadOnly=false");
+
             if (defineCellStyle)
                 DefineCellStyle(dataGrid);
+
             dataGrid.BeginningEdit += new EventHandler<DataGridBeginningEditEventArgs>(OnBeginningEdit);
             _beginEdit = true;
         }
@@ -35,7 +36,7 @@ namespace EditCellDataGrid
 
             var selectedRow = dataGrid.GetSelectedRow();
             var selectedCell = dataGrid.GetCell(selectedRow, dataGrid.CurrentColumn.DisplayIndex);
-            
+
             var textBlock = (selectedCell.Content as TextBlock);
             var value = textBlock.Text;
             var typeInput = TypeInput.F2Native;
@@ -59,9 +60,9 @@ namespace EditCellDataGrid
                 value = textBlock.Text;
                 typeInput = TypeInput.MouseDevice;
             }
-
+            
             var property = GetProperty(dataGrid, e);
-            var view = new EditCell(Window.GetWindow(dataGrid), value, typeInput, e.Column as DataGridTextColumn, property.PropertyType);
+            var view = new EditCell(Window.GetWindow(dataGrid), textBlock.Text, value, typeInput, e.Column, property.PropertyType);
             _column = e.Column as DataGridTextColumn;
             view.textbox.PreviewKeyDown += FieldPreviewKeyDown;
             view.lblRotulo.Text = e.Column.Header.ToString();
@@ -73,15 +74,11 @@ namespace EditCellDataGrid
             {
                 if (OnDefineNewValue(e.Column as DataGridTextColumn, result) == false)
                 {
-                    textBlock.Text = result.Value;
-                    property.SetValue(selectedItem, Get(property.PropertyType, result.Value));
+                    textBlock.Text = result.NewValue;
+                    property.SetValue(selectedItem, Get(property.PropertyType, result.NewValue));
                 }
+                dataGrid.MoveNextRow();
             }
-
-            // define focus
-            selectedCell.Focus();
-            selectedRow.Focus();
-            selectedRow.IsSelected = true;
         }
 
         private void FieldPreviewKeyDown(object sender, KeyEventArgs e)
@@ -181,7 +178,7 @@ namespace EditCellDataGrid
                 view.Left = screenCoordinates.X;
 
                 var pointRow = selectedRow.PointToScreen(new Point(0, 0));
-                view.Top = pointRow.Y- (view.Width / 3);
+                view.Top = pointRow.Y - (view.Width / 3);
             }
             else
             {

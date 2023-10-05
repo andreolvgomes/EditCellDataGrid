@@ -44,6 +44,7 @@ namespace EditCellDataGrid
         public decimal Quantity { get; set; }
         public decimal Total { get; set; }
         public DateTime Date { get; set; }
+        public string Cpf { get; internal set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -75,14 +76,14 @@ namespace EditCellDataGrid
                     Price = price,
                     Quantity = quantity,
                     Total = price * quantity,
-                    Date = DateTime.Now.Date
+                    Date = DateTime.Now.Date,
+                    Cpf = "000.000.000-00"
                 });
             }
 
             dgv.ItemsSource = new List<Produto>();
             dgv.ItemsSource = items;
-
-            new DataGridCellEdit<Produto>().BeginEdit(dgv);
+            dgv.MangerEdit<Produto>();
         }
 
         /// <summary>
@@ -105,7 +106,7 @@ namespace EditCellDataGrid
         private void DataGridTextColumnEditCell_DefineNewValue(object sender, Result result)
         {
             var item = dgv.SelectedItem as Produto;
-            item.Price = Convert.ToDecimal(result.Value);
+            item.Price = Convert.ToDecimal(result.NewValue);
         }
 
         private bool Message(string message, MessageBoxImage messageBoxImage = MessageBoxImage.Information)

@@ -20,8 +20,9 @@ namespace EditCellDataGrid
     public class Result
     {
         public bool Success { get; set; }
-        public string Value { get; set; }
         public bool Changes { get; set; }
+        public string NewValue { get; set; }
+        public string OldValue { get; set; }
     }
 
     public enum TypeInput
@@ -34,34 +35,25 @@ namespace EditCellDataGrid
     public partial class EditCell : Window
     {
         private bool success = false;
-        private readonly DataGridTextColumn _column;
-        private readonly object _oldText;
+        private readonly DataGridColumn _column;
+        private readonly string _oldValue;
         public readonly TextBox textbox = null;
         public readonly Type _propertyType = null;
 
-        public EditCell(Window owner, string value, TypeInput typeInput, DataGridTextColumn column, Type propertyType)
+        public EditCell(Window owner, string oldValue, string value, TypeInput typeInput, DataGridColumn column, Type propertyType)
         {
             InitializeComponent();
 
             Owner = owner;
             _column = column;
             _propertyType = propertyType;
+            _oldValue = oldValue;
 
-            textbox = new TextBox();
-            if (propertyType == typeof(decimal))
-                textbox = new TextBoxDecimal();
-            else if (propertyType == typeof(DateTime))
-                textbox = new TextBoxDate();
-            else if (propertyType == typeof(int) || propertyType == typeof(Int16) || propertyType == typeof(Int32) || propertyType == typeof(Int64))
-                textbox = new TextBoxInt();
-
+            textbox = GetField();
             textbox.Name = "txtEdit";
             textbox.PreviewKeyDown += new KeyEventHandler(textbox_PreviewKeyDown);
             stkTextBox.Children.Add(textbox);
-
-            _oldText = value;
-            value = value.ToUpper();
-
+            
             textbox.Text = value;
             textbox.Focus();
 
@@ -71,6 +63,60 @@ namespace EditCellDataGrid
                 textbox.DefineFocusSelectAll();
 
             PreviewKeyDown += new KeyEventHandler(W_PreviewKeyDown);
+        }
+
+        private TextBox GetField()
+        {
+            var textbox = new TextBox();
+            if (_column as TextColumnEdit is null)
+            {                
+                if (_propertyType == typeof(decimal))
+                    textbox = new TextBoxDecimal() { QuantityDecimais = Decimais(_oldValue) };
+                else if (_propertyType == typeof(DateTime))
+                    textbox = new TextBoxDate();
+                else if (_propertyType == typeof(int) || _propertyType == typeof(Int16) || _propertyType == typeof(Int32) || _propertyType == typeof(Int64))
+                    textbox = new TextBoxInt();
+            }
+            else
+            {
+                textbox = FieldEditCustom(_column as TextColumnEdit);
+                var col = _column as TextColumnEdit;
+                if (col.MaxLength != TextColumnEdit.MaxLengthDefault)
+                    textbox.MaxLength = col.MaxLength;
+            }
+            return textbox;
+        }
+
+        private TextBox FieldEditCustom(TextColumnEdit column)
+        {
+            var colDecimal = column as TextColumnEditDecimal;
+            if (colDecimal != null)
+                return new TextBoxDecimal() { QuantityDecimais = colDecimal.Decimais };
+
+            var colDate = column as TextColumnEditDate;
+            if (colDate != null)
+                return new TextBoxDate();
+
+            var colInteger = column as TextColumnEditInteger;
+            if (colInteger != null)
+                return new TextBoxInt();
+
+            var colMask = column as TextColumnEditMask;
+            if (colMask != null)
+                return new TextBoxMask() { Mask = colMask.Mask };
+
+            return new TextBox();
+        }
+
+        private int Decimais(object oldValue)
+        {
+            if (oldValue == null)
+                return 2;
+
+            var split = oldValue.ToString().Split(',');
+            if (split.Length > 1)
+                return split[1].Length;
+            return 2;
         }
 
         private void W_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -85,8 +131,9 @@ namespace EditCellDataGrid
             return new Result()
             {
                 Success = success,
-                Value = textbox.Text,
-                Changes = !textbox.Equals(_oldText)
+                NewValue = textbox.Text,
+                OldValue = _oldValue.ToString(),
+                Changes = !textbox.Equals(_oldValue)
             };
         }
 
@@ -156,7 +203,7 @@ namespace EditCellDataGrid
             {
                 var eventArgs = new EditCellEventArgs()
                 {
-                    OldValue = _oldText,
+                    OldValue = _oldValue,
                     NewValue = textbox.Text
                 };
 

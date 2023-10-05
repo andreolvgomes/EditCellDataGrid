@@ -3,9 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         SizeToContent="Height" Width="250" WindowStyle="None" ShowInTaskbar="False"
         >
-    <StackPanel Margin="10" MouseLeftButtonDown="StackPanel_MouseLeftButtonDown">
-        <TextBlock x:Name="lblRotulo" Text="Label" Height="auto"/>
-        <StackPanel x:Name="stkTextBox">
+        <StackPanel Margin="10" MouseLeftButtonDown="StackPanel_MouseLeftButtonDown">
+            <TextBlock x:Name="lblRotulo" Text="Label" Height="auto"/>
+            <StackPanel x:Name="stkTextBox">
+            </StackPanel>
         </StackPanel>
-    </StackPanel>
 </Window>
