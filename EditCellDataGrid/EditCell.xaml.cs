@@ -37,27 +37,23 @@ namespace EditCellDataGrid
         private readonly DataGridTextColumn _column;
         private readonly object _oldText;
         public readonly TextBox textbox = null;
+        public readonly Type _propertyType = null;
 
-        public EditCell(Window owner, string value, TypeInput typeInput, DataGridTextColumn column, Type typeColumn)
+        public EditCell(Window owner, string value, TypeInput typeInput, DataGridTextColumn column, Type propertyType)
         {
             InitializeComponent();
 
             Owner = owner;
             _column = column;
+            _propertyType = propertyType;
 
             textbox = new TextBox();
-            if (typeColumn == typeof(decimal))
-            {
+            if (propertyType == typeof(decimal))
                 textbox = new TextBoxDecimal();
-            }
-            else if (typeColumn == typeof(DateTime))
-            {
+            else if (propertyType == typeof(DateTime))
                 textbox = new TextBoxDate();
-            }
-            else if (typeColumn == typeof(int) || typeColumn == typeof(Int16) || typeColumn == typeof(Int32) || typeColumn == typeof(Int64))
-            {
+            else if (propertyType == typeof(int) || propertyType == typeof(Int16) || propertyType == typeof(Int32) || propertyType == typeof(Int64))
                 textbox = new TextBoxInt();
-            }
 
             textbox.Name = "txtEdit";
             textbox.PreviewKeyDown += new KeyEventHandler(textbox_PreviewKeyDown);
@@ -118,7 +114,23 @@ namespace EditCellDataGrid
 
         private bool Valid()
         {
+            if (CheckDateTime() == false)
+                return false;
             return OnValidation();
+        }
+
+        private bool CheckDateTime()
+        {
+            if (_propertyType == typeof(DateTime))
+            {
+                if (DateTime.TryParse(textbox.Text, out _) == false)
+                {
+                    textbox.Background = new SolidColorBrush(Colors.Red);
+                    textbox.Foreground = new SolidColorBrush(Colors.White);
+                    return false;
+                }
+            }
+            return true;
         }
 
         private void StackPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

@@ -173,12 +173,25 @@ namespace EditCellDataGrid
         /// <param name="view"></param>
         private void DefinePosition(DataGridCell selectedCell, DataGridRow selectedRow, Window view)
         {
-            var screenCoordinates = selectedCell.PointToScreen(new Point(0, 0));
-            view.Width = selectedCell.ActualWidth + 20;
-            view.Left = screenCoordinates.X;
+            var scaler = GetWindowsScaling();
+            if (scaler == 100)
+            {
+                var screenCoordinates = selectedCell.PointToScreen(new Point(0, 0));
+                view.Width = selectedCell.ActualWidth + 20;
+                view.Left = screenCoordinates.X;
 
-            var pointRow = selectedRow.PointToScreen(new Point(0, 0));
-            view.Top = pointRow.Y;
+                var pointRow = selectedRow.PointToScreen(new Point(0, 0));
+                view.Top = pointRow.Y- (view.Width / 3);
+            }
+            else
+            {
+                view.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            }
+        }
+
+        public static int GetWindowsScaling()
+        {
+            return (int)(100 * System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width / SystemParameters.PrimaryScreenWidth);
         }
 
         /// <summary>
