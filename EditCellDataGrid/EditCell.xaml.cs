@@ -1,24 +1,17 @@
 ﻿using EditCellDataGrid.EventsArgs;
 using EditCellDataGrid.Extenders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using System.Reflection;
+using System.Windows;
+using System;
 
 namespace EditCellDataGrid
 {
     public class Result
     {
+        public bool PressedEnter { get; set; }
         public bool Success { get; set; }
         public bool Changes { get; set; }
         public string NewValue { get; set; }
@@ -86,11 +79,22 @@ namespace EditCellDataGrid
             base.OnDeactivated(e);
             if (closed == false && validating == false)
             {
-                borderMain.BorderBrush = new SolidColorBrush(Colors.Red);
-                borderMain.BorderThickness = new Thickness(2);
-
-                //Close();
+                //borderMain.BorderBrush = new SolidColorBrush(Colors.Red);
+                //borderMain.BorderThickness = new Thickness(2);
+                if (ValidCloseInDeactivated())
+                {
+                    ConfirmedChanges();
+                    Close();
+                }
             }
+        }
+
+        private bool ValidCloseInDeactivated()
+        {
+            if (!CheckDateTime()) return false;
+            if (CheckIsExistsEventValidation())
+                return Valid();
+            return true;
         }
 
         private TextBox GetField()
@@ -171,23 +175,26 @@ namespace EditCellDataGrid
             ShowDialog();
             return new Result()
             {
+                PressedEnter = pressedEnter,
                 Success = success,
                 NewValue = textbox.Text,
                 OldValue = _oldValue.ToString(),
-                Changes = !textbox.Equals(_oldValue)
+                Changes = !textbox.Text.Equals(_oldValue)
             };
         }
 
+        private bool pressedEnter = false;
         private void textbox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
                 e.Handled = true;
-                Ok();
+                pressedEnter = true;
+                ConfirmedChanges();
             }
         }
 
-        private void Ok()
+        private void ConfirmedChanges()
         {
             if (Valid() == false)
             {
@@ -204,8 +211,16 @@ namespace EditCellDataGrid
         private bool Valid()
         {
             if (CheckDateTime() == false)
+            {
+                textbox.Focus();
                 return false;
-            return OnValidation();
+            }
+            if (OnValidation() == false)
+            {
+                textbox.Focus();
+                return false;
+            }
+            return true;
         }
 
         private bool CheckDateTime()
@@ -236,32 +251,23 @@ namespace EditCellDataGrid
 
                 if (_column == null) return true;
 
-                Type type = _column.GetType();
-
-                var field = type.GetField("Validation", BindingFlags.NonPublic | BindingFlags.Instance);
-                if (field == null) return true;
-
-                var eventDelegate = field.GetValue(_column) as MulticastDelegate;
-                if (eventDelegate == null)
-                    return true;
-
-                var events = eventDelegate.GetInvocationList();
-                if (events.Length == 0)
-                    return false;
-
-                foreach (var eventHandler in eventDelegate.GetInvocationList())
+                var eventDelegate = GetEventDelegateValidate();
+                if (eventDelegate != null)
                 {
-                    var eventArgs = new ValidateEventArgs()
+                    foreach (var eventHandler in eventDelegate.GetInvocationList())
                     {
-                        NewValue = textbox.Text,
-                        OldValue = _oldValue
-                    };
+                        var eventArgs = new ValidateEventArgs()
+                        {
+                            NewValue = textbox.Text,
+                            OldValue = _oldValue
+                        };
 
-                    var result = (bool)eventHandler.Method.Invoke(
-                            eventHandler.Target, new object[] { _column, eventArgs });
+                        var result = (bool)eventHandler.Method.Invoke(
+                                eventHandler.Target, new object[] { _column, eventArgs });
 
-                    if (result == false)
-                        return result;
+                        if (result == false)
+                            return result;
+                    }
                 }
                 return true;
             }
@@ -273,6 +279,24 @@ namespace EditCellDataGrid
             {
                 validating = false;
             }
+        }
+
+        private bool CheckIsExistsEventValidation()
+        {
+            var eventDelegate = GetEventDelegateValidate();
+            return eventDelegate != null;
+        }
+
+        private MulticastDelegate GetEventDelegateValidate()
+        {
+            Type type = _column.GetType();
+
+            var field = type.GetField("Validation", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (field == null)
+                return null;
+
+            var eventDelegate = field.GetValue(_column) as MulticastDelegate;
+            return eventDelegate;
         }
     }
 }

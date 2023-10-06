@@ -75,19 +75,23 @@ namespace EditCellDataGrid
             var result = view.Get();
             if (result.Success)
             {
-                var eventArgs = new EditCellEventArgs()
+                if (result.Changes)
                 {
-                    Row = rowSelected,
-                    Cell = cellSelected,
-                    NewValue = result.NewValue,
-                    OldValue = result.OldValue
-                };
+                    var eventArgs = new EditCellEventArgs()
+                    {
+                        Row = rowSelected,
+                        Cell = cellSelected,
+                        NewValue = result.NewValue,
+                        OldValue = result.OldValue
+                    };
 
-                if (OnDefineNewValue(e.Column as DataGridTextColumn, eventArgs) == false)
-                    property.SetValue(selectedItem, Convert.ChangeType(result.NewValue, property.PropertyType));
+                    if (OnDefineNewValue(e.Column as DataGridTextColumn, eventArgs) == false)
+                        property.SetValue(selectedItem, Convert.ChangeType(result.NewValue, property.PropertyType));
 
-                OnNewValueConfirmed(e.Column as DataGridTextColumn, eventArgs);
-                dataGrid.MoveNextRow();
+                    OnNewValueConfirmed(e.Column as DataGridTextColumn, eventArgs);
+                }
+                if (result.PressedEnter)
+                    dataGrid.MoveNextRow();
             }
         }
 
