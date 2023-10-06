@@ -10,6 +10,7 @@ namespace EditCellDataGrid.Extenders
         public event EditCellValidationEventHandler Validation;
         public event DefineNewValueEventHandler DefineNewValue;
         public event KeyEventHandler PreviewKeyDown;
+        public event NewValueConfirmedEventHandler NewValueConfirmed;
 
         public static int MaxLengthDefault = 9999;
 

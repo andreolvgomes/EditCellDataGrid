@@ -34,11 +34,14 @@ namespace EditCellDataGrid
 
     public partial class EditCell : Window
     {
+        private bool closed = false;
+        private bool validating = false;
         private bool success = false;
+        public TextBox textbox = null;
+
         private readonly DataGridColumn _column;
         private readonly string _oldValue;
-        public readonly TextBox textbox = null;
-        public readonly Type _propertyType = null;
+        private readonly Type _propertyType = null;
 
         public EditCell(Window owner, string oldValue, string value, TypeInput typeInput, DataGridColumn column, Type propertyType)
         {
@@ -49,12 +52,8 @@ namespace EditCellDataGrid
             _propertyType = propertyType;
             _oldValue = oldValue;
 
-            textbox = GetField();
-            textbox.Name = "txtEdit";
-            textbox.PreviewKeyDown += new KeyEventHandler(textbox_PreviewKeyDown);
-            stkTextBox.Children.Add(textbox);
-            
-            textbox.Text = value;
+            CrateTextBox();
+            textbox.Text = value.ToUpper();
             textbox.Focus();
 
             if (typeInput == TypeInput.KeyboardDevice)
@@ -65,11 +64,40 @@ namespace EditCellDataGrid
             PreviewKeyDown += new KeyEventHandler(W_PreviewKeyDown);
         }
 
+        private void CrateTextBox()
+        {
+            textbox = GetField();
+            textbox.ToolTip = "Enter - Confirmar\nEsc - Sair";
+            textbox.CharacterCasing = CharacterCasing.Upper;
+            textbox.Name = "txtEdit";
+            textbox.PreviewKeyDown += new KeyEventHandler(textbox_PreviewKeyDown);
+            stkTextBox.Children.Add(textbox);
+        }
+
+        protected override void OnActivated(EventArgs e)
+        {
+            base.OnActivated(e);
+            borderMain.BorderBrush = new SolidColorBrush(Colors.Teal);
+            borderMain.BorderThickness = new Thickness(1);
+        }
+
+        protected override void OnDeactivated(EventArgs e)
+        {
+            base.OnDeactivated(e);
+            if (closed == false && validating == false)
+            {
+                borderMain.BorderBrush = new SolidColorBrush(Colors.Red);
+                borderMain.BorderThickness = new Thickness(2);
+
+                //Close();
+            }
+        }
+
         private TextBox GetField()
         {
             var textbox = new TextBox();
             if (_column as TextColumnEdit is null)
-            {                
+            {
                 if (_propertyType == typeof(decimal))
                     textbox = new TextBoxDecimal() { QuantityDecimais = Decimais(_oldValue) };
                 else if (_propertyType == typeof(DateTime))
@@ -85,6 +113,16 @@ namespace EditCellDataGrid
                     textbox.MaxLength = col.MaxLength;
             }
             return textbox;
+        }
+
+        internal void DefineStyleTextBox(DataGrid dataGrid, DataGridRow dataGridRow)
+        {
+            textbox.FontSize = dataGrid.FontSize;
+            textbox.Foreground = dataGrid.Foreground;
+            textbox.FontWeight = dataGrid.FontWeight;
+            textbox.FontFamily = dataGrid.FontFamily;
+            if (dataGridRow.ActualHeight > 0)
+                textbox.Height = dataGridRow.ActualHeight;
         }
 
         private TextBox FieldEditCustom(TextColumnEdit column)
@@ -122,7 +160,10 @@ namespace EditCellDataGrid
         private void W_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
+            {
+                closed = true;
                 Close();
+            }
         }
 
         public Result Get()
@@ -155,6 +196,7 @@ namespace EditCellDataGrid
             else
             {
                 success = true;
+                closed = true;
                 Close();
             }
         }
@@ -188,32 +230,49 @@ namespace EditCellDataGrid
 
         public bool OnValidation()
         {
-            if (_column == null) return true;
-
-            Type type = _column.GetType();
-
-            var field = type.GetField("Validation", BindingFlags.NonPublic | BindingFlags.Instance);
-            if (field == null) return true;
-
-            var eventDelegate = field.GetValue(_column) as MulticastDelegate;
-            if (eventDelegate == null)
-                return true;
-
-            foreach (var eventHandler in eventDelegate.GetInvocationList())
+            try
             {
-                var eventArgs = new EditCellEventArgs()
+                validating = true;
+
+                if (_column == null) return true;
+
+                Type type = _column.GetType();
+
+                var field = type.GetField("Validation", BindingFlags.NonPublic | BindingFlags.Instance);
+                if (field == null) return true;
+
+                var eventDelegate = field.GetValue(_column) as MulticastDelegate;
+                if (eventDelegate == null)
+                    return true;
+
+                var events = eventDelegate.GetInvocationList();
+                if (events.Length == 0)
+                    return false;
+
+                foreach (var eventHandler in eventDelegate.GetInvocationList())
                 {
-                    OldValue = _oldValue,
-                    NewValue = textbox.Text
-                };
+                    var eventArgs = new ValidateEventArgs()
+                    {
+                        NewValue = textbox.Text,
+                        OldValue = _oldValue
+                    };
 
-                var result = (bool)eventHandler.Method.Invoke(
-                        eventHandler.Target, new object[] { _column, eventArgs });
+                    var result = (bool)eventHandler.Method.Invoke(
+                            eventHandler.Target, new object[] { _column, eventArgs });
 
-                if (result == false)
-                    return result;
+                    if (result == false)
+                        return result;
+                }
+                return true;
             }
-            return true;
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                validating = false;
+            }
         }
     }
 }

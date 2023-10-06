@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Windows;
 using System;
 using EditCellDataGrid.Extenders;
+using EditCellDataGrid.EventsArgs;
 
 namespace EditCellDataGrid
 {
@@ -34,10 +35,10 @@ namespace EditCellDataGrid
             var dataGrid = sender as DataGrid;
             var selectedItem = dataGrid.SelectedItem;
 
-            var selectedRow = dataGrid.GetSelectedRow();
-            var selectedCell = dataGrid.GetCell(selectedRow, dataGrid.CurrentColumn.DisplayIndex);
+            var rowSelected = dataGrid.GetSelectedRow();
+            var cellSelected = dataGrid.GetCell(rowSelected, dataGrid.CurrentColumn.DisplayIndex);
 
-            var textBlock = (selectedCell.Content as TextBlock);
+            var textBlock = (cellSelected.Content as TextBlock);
             var value = textBlock.Text;
             var typeInput = TypeInput.F2Native;
 
@@ -60,23 +61,32 @@ namespace EditCellDataGrid
                 value = textBlock.Text;
                 typeInput = TypeInput.MouseDevice;
             }
-            
+
             var property = GetProperty(dataGrid, e);
             var view = new EditCell(Window.GetWindow(dataGrid), textBlock.Text, value, typeInput, e.Column, property.PropertyType);
+            view.DefineStyleTextBox(dataGrid, rowSelected);
+
             _column = e.Column as DataGridTextColumn;
             view.textbox.PreviewKeyDown += FieldPreviewKeyDown;
             view.lblRotulo.Text = e.Column.Header.ToString();
 
-            DefinePosition(selectedCell, selectedRow, view);
+            DefinePosition(cellSelected, rowSelected, view);
 
             var result = view.Get();
             if (result.Success)
             {
-                if (OnDefineNewValue(e.Column as DataGridTextColumn, result) == false)
+                var eventArgs = new EditCellEventArgs()
                 {
-                    textBlock.Text = result.NewValue;
-                    property.SetValue(selectedItem, Get(property.PropertyType, result.NewValue));
-                }
+                    Row = rowSelected,
+                    Cell = cellSelected,
+                    NewValue = result.NewValue,
+                    OldValue = result.OldValue
+                };
+
+                if (OnDefineNewValue(e.Column as DataGridTextColumn, eventArgs) == false)
+                    property.SetValue(selectedItem, Convert.ChangeType(result.NewValue, property.PropertyType));
+
+                OnNewValueConfirmed(e.Column as DataGridTextColumn, eventArgs);
                 dataGrid.MoveNextRow();
             }
         }
@@ -113,7 +123,7 @@ namespace EditCellDataGrid
 
         private DataGridTextColumn _column;
 
-        public bool OnDefineNewValue(DataGridTextColumn column, Result result)
+        public bool OnDefineNewValue(DataGridTextColumn column, EditCellEventArgs eventArgs)
         {
             if (column == null) return false;
 
@@ -133,7 +143,32 @@ namespace EditCellDataGrid
             foreach (var eventHandler in events)
             {
                 eventHandler.Method.Invoke(
-                        eventHandler.Target, new object[] { column, result });
+                        eventHandler.Target, new object[] { column, eventArgs });
+            }
+            return true;
+        }
+
+        public bool OnNewValueConfirmed(DataGridTextColumn column, EditCellEventArgs eventArgs)
+        {
+            if (column == null) return false;
+
+            Type type = column.GetType();
+
+            var field = type.GetField("NewValueConfirmed", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (field == null) return false;
+
+            var eventDelegate = field.GetValue(column) as MulticastDelegate;
+            if (eventDelegate == null)
+                return false;
+
+            var events = eventDelegate.GetInvocationList();
+            if (events.Length == 0)
+                return false;
+
+            foreach (var eventHandler in events)
+            {
+                eventHandler.Method.Invoke(
+                        eventHandler.Target, new object[] { column, eventArgs });
             }
             return true;
         }
@@ -165,20 +200,21 @@ namespace EditCellDataGrid
         /// <summary>
         /// Define position of the Window Edit
         /// </summary>
-        /// <param name="selectedCell"></param>
-        /// <param name="selectedRow"></param>
+        /// <param name="cellSelected"></param>
+        /// <param name="rowSelected"></param>
         /// <param name="view"></param>
-        private void DefinePosition(DataGridCell selectedCell, DataGridRow selectedRow, Window view)
+        private void DefinePosition(DataGridCell cellSelected, DataGridRow rowSelected, Window view)
         {
             var scaler = GetWindowsScaling();
+            view.MinWidth = cellSelected.ActualWidth;// + 20;
+
             if (scaler == 100)
             {
-                var screenCoordinates = selectedCell.PointToScreen(new Point(0, 0));
-                view.Width = selectedCell.ActualWidth + 20;
+                var screenCoordinates = cellSelected.PointToScreen(new Point(0, 0));
                 view.Left = screenCoordinates.X;
 
-                var pointRow = selectedRow.PointToScreen(new Point(0, 0));
-                view.Top = pointRow.Y - (view.Width / 3);
+                var pointRow = rowSelected.PointToScreen(new Point(0, 0));
+                view.Top = pointRow.Y - 27;//-27; joga um pouco pra cima
             }
             else
             {
@@ -189,18 +225,6 @@ namespace EditCellDataGrid
         public static int GetWindowsScaling()
         {
             return (int)(100 * System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width / SystemParameters.PrimaryScreenWidth);
-        }
-
-        /// <summary>
-        /// Convert value
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="str"></param>
-        /// <returns></returns>
-        private object Get(Type type, string str)
-        {
-            System.ComponentModel.TypeConverter converter = System.ComponentModel.TypeDescriptor.GetConverter(type);
-            return converter.ConvertFrom(str);
         }
 
         /// <summary>

@@ -60,6 +60,7 @@
     <Compile Include="Delegates\EditCellValidationEventHandler.cs" />
     <Compile Include="Delegates\DefineNewValueEventHandler.cs" />
     <Compile Include="DataGridCellEdit.cs" />
+    <Compile Include="Delegates\NewValueConfirmedEventHandler.cs" />
     <Compile Include="EventsArgs\EditCellEventArgs.cs" />
     <Compile Include="Extenders\TextBoxMask.cs" />
     <Compile Include="Extensions\DataGridExtensions.cs" />

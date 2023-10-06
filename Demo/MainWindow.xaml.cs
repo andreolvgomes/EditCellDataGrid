@@ -1,60 +1,13 @@
 ﻿using EditCellDataGrid.EventsArgs;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Interop;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace EditCellDataGrid
 {
-    public class Produto : INotifyPropertyChanged
-    {
-        public int Id { get; set; }
-        public string Description { get; set; }
-
-        private decimal _Price;
-
-        public decimal Price
-        {
-            get { return _Price; }
-            set
-            {
-                if (_Price != value)
-                {
-                    _Price = value;
-                    OnPropertyChanged("Price");
-                }
-            }
-        }
-
-        public decimal Quantity { get; set; }
-        public decimal Total { get; set; }
-        public DateTime Date { get; set; }
-        public string Cpf { get; internal set; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void OnPropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-
     public partial class MainWindow : Window
     {
         private List<Produto> items = null;
@@ -77,7 +30,8 @@ namespace EditCellDataGrid
                     Quantity = quantity,
                     Total = price * quantity,
                     Date = DateTime.Now.Date,
-                    Cpf = "000.000.000-00"
+                    Cpf = "000.000.000-00",
+                    Obs = Guid.NewGuid().ToString()
                 });
             }
 
@@ -86,13 +40,18 @@ namespace EditCellDataGrid
             dgv.MangerEdit<Produto>();
         }
 
+        protected override void OnActivated(EventArgs e)
+        {
+            base.OnActivated(e);
+        }
+
         /// <summary>
         /// Validation example column Id
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <returns></returns>
-        private bool DataGridTextColumn_ValidationEdit(object sender, EditCellEventArgs e)
+        private bool DataGridTextColumn_ValidationEdit(object sender, ValidateEventArgs e)
         {
             if (e.NewValue is null || e.NewValue.ToString().CheckNullOrEmpty())
                 return Message("Informe o nome Id");
@@ -103,7 +62,7 @@ namespace EditCellDataGrid
             return Message("Id já existe na lista");
         }        
 
-        private void DataGridTextColumnEditCell_DefineNewValue(object sender, Result result)
+        private void DataGridTextColumnEditCell_DefineNewValue(object sender, EditCellEventArgs result)
         {
             var item = dgv.SelectedItem as Produto;
             item.Price = Convert.ToDecimal(result.NewValue);

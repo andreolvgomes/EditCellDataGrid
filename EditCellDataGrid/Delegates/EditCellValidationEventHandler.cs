@@ -2,5 +2,5 @@
 
 namespace EditCellDataGrid.Delegates
 {
-    public delegate bool EditCellValidationEventHandler(object sender, EditCellEventArgs e);
+    public delegate bool EditCellValidationEventHandler(object sender, ValidateEventArgs e);
 }

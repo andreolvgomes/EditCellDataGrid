@@ -18,19 +18,20 @@
             <TextBlock Text="   - Digitar novo valor na célula" Foreground="DarkBlue"/>
         </StackPanel>
 
-        <DataGrid x:Name="dgv" Grid.Row="1" Background="White" AutoGenerateColumns="False" IsReadOnly="False"
+        <DataGrid x:Name="dgv" Grid.Row="1" Background="White" AutoGenerateColumns="False" IsReadOnly="False" FontSize="20"
                   CanUserReorderColumns="True">
             <DataGrid.Columns>
                 <extenders:TextColumnEdit Header="Código" Binding="{Binding Id}" Validation="DataGridTextColumn_ValidationEdit" PreviewKeyDown="DataGridTextColumnEditCell_PreviewKeyDown" MaxLength="5"/>
-                <DataGridTextColumn Header="Descrição" Width="*" Binding="{Binding Description}" IsReadOnly="True"/>
-                <extenders:TextColumnEditDecimal Header="Preço" Binding="{Binding Price, StringFormat={}{0:n5}, ConverterCulture=pt-br}"
+                <DataGridTextColumn Header="Descrição" Width="300" Binding="{Binding Description}" IsReadOnly="True"/>
+                <extenders:TextColumnEditDecimal Header="Preço" Binding="{Binding Price, StringFormat={}{0:n5}, ConverterCulture=pt-br}" Decimais="5"
                                                      Width="100" DefineNewValue="DataGridTextColumnEditCell_DefineNewValue"/>
-                <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity, StringFormat={}{0:n2}, ConverterCulture=pt-br}" Width="100"/>
+                <extenders:TextColumnEditDecimal Header="Quantity" Binding="{Binding Quantity, StringFormat={}{0:n2}, ConverterCulture=pt-br}" Width="100"/>
                 <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat={}{0:n2}, ConverterCulture=pt-br}" Width="100"/>
                 <DataGridTextColumn Header="Sem Binding(Error)" Width="100"/>
                 <DataGridTextColumn Header="Data" Binding="{Binding Date, StringFormat={}{0:dd/MM/yyyy}, ConverterCulture=pt-br}" Width="100"/>
                 <DataGridTextColumn Header="Sem Validação" Binding="{Binding Date, StringFormat={}{0:dd/MM/yyyy}, ConverterCulture=pt-br}" Width="100"/>
                 <extenders:TextColumnEditMask Header="Mask" Mask="000.000.000-00" Binding="{Binding Cpf}" Width="100"/>
+                <DataGridTextColumn Header="Observação" Width="300" Binding="{Binding Obs}"/>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

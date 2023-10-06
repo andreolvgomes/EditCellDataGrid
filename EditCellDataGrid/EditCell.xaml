@@ -1,11 +1,13 @@
 ﻿<Window x:Class="EditCellDataGrid.EditCell"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        SizeToContent="Height" Width="250" WindowStyle="None" ShowInTaskbar="False"
+        SizeToContent="WidthAndHeight" Width="100" WindowStyle="None" ShowInTaskbar="False" AllowsTransparency="True"
         >
-        <StackPanel Margin="10" MouseLeftButtonDown="StackPanel_MouseLeftButtonDown">
+    <Border x:Name="borderMain" BorderBrush="Teal" BorderThickness="2" MouseLeftButtonDown="StackPanel_MouseLeftButtonDown">
+        <StackPanel Margin="2,10,2,10">
             <TextBlock x:Name="lblRotulo" Text="Label" Height="auto"/>
             <StackPanel x:Name="stkTextBox">
             </StackPanel>
         </StackPanel>
+    </Border>
 </Window>
