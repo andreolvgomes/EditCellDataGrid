@@ -7,10 +7,9 @@ namespace EditCellDataGrid.Extenders
 {
     public class TextColumnEdit : DataGridTextColumn
     {
-        public event EditCellValidationEventHandler Validation;
-        public event DefineNewValueEventHandler DefineNewValue;
-        public event KeyEventHandler PreviewKeyDown;
-        public event NewValueConfirmedEventHandler NewValueConfirmed;
+        public event EditCellValidationEventHandler EventValidation;
+        public event NewValueConfirmedEventHandler EventNewValueConfirmed;
+        public event EditCellF2EventHandler EventF2EventHandler;
 
         public static int MaxLengthDefault = 9999;
 
@@ -27,6 +26,10 @@ namespace EditCellDataGrid.Extenders
 
     public class TextColumnEditDecimal : TextColumnEdit
     {
+        public event EditCellValidationEventHandler EventValidation;
+        public event NewValueConfirmedEventHandler EventNewValueConfirmed;
+        public event EditCellF2EventHandler EventF2EventHandler;
+
         public int Decimais
         {
             get { return (int)GetValue(DecimaisProperty); }
@@ -40,14 +43,24 @@ namespace EditCellDataGrid.Extenders
 
     public class TextColumnEditDate : TextColumnEdit
     {
+        public event EditCellValidationEventHandler EventValidation;
+        public event NewValueConfirmedEventHandler EventNewValueConfirmed;
+        public event EditCellF2EventHandler EventF2EventHandler;
     }
 
     public class TextColumnEditInteger : TextColumnEdit
     {
+        public event EditCellValidationEventHandler EventValidation;
+        public event NewValueConfirmedEventHandler EventNewValueConfirmed;
+        public event EditCellF2EventHandler EventF2EventHandler;
     }
 
     public class TextColumnEditMask : TextColumnEdit
     {
+        public event EditCellValidationEventHandler EventValidation;
+        public event NewValueConfirmedEventHandler EventNewValueConfirmed;
+        public event EditCellF2EventHandler EventF2EventHandler;
+
         public string Mask
         {
             get { return (string)GetValue(MaskProperty); }

@@ -5,7 +5,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Reflection;
 using System.Windows;
+using System.Linq;
 using System;
+using EditCellDataGrid.Helpers;
 
 namespace EditCellDataGrid
 {
@@ -27,10 +29,13 @@ namespace EditCellDataGrid
 
     public partial class EditCell : Window
     {
+        public TextBox Field { get; set; }
+
+        private bool pressedEnter = false;
         private bool closed = false;
         private bool validating = false;
+        private bool f2pressed = false;
         private bool success = false;
-        public TextBox textbox = null;
 
         private readonly DataGridColumn _column;
         private readonly string _oldValue;
@@ -46,25 +51,25 @@ namespace EditCellDataGrid
             _oldValue = oldValue;
 
             CrateTextBox();
-            textbox.Text = value.ToUpper();
-            textbox.Focus();
+            Field.Text = value.ToUpper();
+            Field.Focus();
 
             if (typeInput == TypeInput.KeyboardDevice)
-                textbox.SelectionStart = value.Length;
+                Field.SelectionStart = value.Length;
             else
-                textbox.DefineFocusSelectAll();
+                Field.DefineFocusSelectAll();
 
             PreviewKeyDown += new KeyEventHandler(W_PreviewKeyDown);
         }
 
         private void CrateTextBox()
         {
-            textbox = GetField();
-            textbox.ToolTip = "Enter - Confirmar\nEsc - Sair";
-            textbox.CharacterCasing = CharacterCasing.Upper;
-            textbox.Name = "txtEdit";
-            textbox.PreviewKeyDown += new KeyEventHandler(textbox_PreviewKeyDown);
-            stkTextBox.Children.Add(textbox);
+            Field = GetField();
+            Field.ToolTip = "Enter - Confirmar\nEsc - Sair";
+            Field.CharacterCasing = CharacterCasing.Upper;
+            Field.Name = "txtEdit";
+            Field.PreviewKeyDown += new KeyEventHandler(textbox_PreviewKeyDown);
+            stkTextBox.Children.Add(Field);
         }
 
         protected override void OnActivated(EventArgs e)
@@ -77,7 +82,7 @@ namespace EditCellDataGrid
         protected override void OnDeactivated(EventArgs e)
         {
             base.OnDeactivated(e);
-            if (closed == false && validating == false)
+            if (closed == false && validating == false && f2pressed == false)
             {
                 //borderMain.BorderBrush = new SolidColorBrush(Colors.Red);
                 //borderMain.BorderThickness = new Thickness(2);
@@ -91,7 +96,7 @@ namespace EditCellDataGrid
 
         private bool ValidCloseInDeactivated()
         {
-            if (!CheckDateTime()) return false;
+            if (!CheckInputIsValid()) return false;
             if (CheckIsExistsEventValidation())
                 return Valid();
             return true;
@@ -121,12 +126,12 @@ namespace EditCellDataGrid
 
         internal void DefineStyleTextBox(DataGrid dataGrid, DataGridRow dataGridRow)
         {
-            textbox.FontSize = dataGrid.FontSize;
-            textbox.Foreground = dataGrid.Foreground;
-            textbox.FontWeight = dataGrid.FontWeight;
-            textbox.FontFamily = dataGrid.FontFamily;
+            Field.FontSize = dataGrid.FontSize;
+            Field.Foreground = dataGrid.Foreground;
+            Field.FontWeight = dataGrid.FontWeight;
+            Field.FontFamily = dataGrid.FontFamily;
             if (dataGridRow.ActualHeight > 0)
-                textbox.Height = dataGridRow.ActualHeight;
+                Field.Height = dataGridRow.ActualHeight;
         }
 
         private TextBox FieldEditCustom(TextColumnEdit column)
@@ -146,6 +151,13 @@ namespace EditCellDataGrid
             var colMask = column as TextColumnEditMask;
             if (colMask != null)
                 return new TextBoxMask() { Mask = colMask.Mask };
+
+            if (_propertyType == typeof(decimal))
+                return new TextBoxDecimal() { QuantityDecimais = Decimais(_oldValue) };
+            else if (_propertyType == typeof(DateTime))
+                return new TextBoxDate();
+            else if (_propertyType == typeof(int) || _propertyType == typeof(Int16) || _propertyType == typeof(Int32) || _propertyType == typeof(Int64))
+                return new TextBoxInt();
 
             return new TextBox();
         }
@@ -168,22 +180,38 @@ namespace EditCellDataGrid
                 closed = true;
                 Close();
             }
+            else if (e.Key == Key.F2)
+            {
+                try
+                {
+                    f2pressed = true;
+                    var value = OnEventF2EventHandler();
+                    if (value != null)
+                        Field.Text = value;
+                }
+                catch
+                {
+                }
+                finally
+                {
+                    f2pressed = false;
+                }
+            }
         }
 
-        public Result Get()
+        public Result Input()
         {
             ShowDialog();
             return new Result()
             {
                 PressedEnter = pressedEnter,
                 Success = success,
-                NewValue = textbox.Text,
+                NewValue = Field.Text,
                 OldValue = _oldValue.ToString(),
-                Changes = !textbox.Text.Equals(_oldValue)
+                Changes = !Field.Text.Equals(_oldValue)
             };
         }
 
-        private bool pressedEnter = false;
         private void textbox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -198,7 +226,7 @@ namespace EditCellDataGrid
         {
             if (Valid() == false)
             {
-                textbox.DefineFocusSelectAll();
+                Field.DefineFocusSelectAll();
             }
             else
             {
@@ -210,29 +238,29 @@ namespace EditCellDataGrid
 
         private bool Valid()
         {
-            if (CheckDateTime() == false)
-            {
-                textbox.Focus();
-                return false;
-            }
-            if (OnValidation() == false)
-            {
-                textbox.Focus();
-                return false;
-            }
+            if (CheckInputIsValid() == false) return Focus(Field);
+            if (OnValidation() == false) return Focus(Field);
             return true;
         }
 
-        private bool CheckDateTime()
+        private bool Focus(TextBox text)
         {
-            if (_propertyType == typeof(DateTime))
+            Dispatcher.BeginInvoke(new Action(() =>
             {
-                if (DateTime.TryParse(textbox.Text, out _) == false)
-                {
-                    textbox.Background = new SolidColorBrush(Colors.Red);
-                    textbox.Foreground = new SolidColorBrush(Colors.White);
-                    return false;
-                }
+                this.Activate();
+                text.Focus();
+            }));
+            return false;
+        }
+
+        private bool CheckInputIsValid()
+        {
+            if (CheckTypeWithInputText.CheckInputIsValid(_propertyType, Field.Text) == false)
+            {
+                Field.Background = new SolidColorBrush(Colors.Red);
+                Field.Foreground = new SolidColorBrush(Colors.White);
+
+                return false;
             }
             return true;
         }
@@ -258,12 +286,12 @@ namespace EditCellDataGrid
                     {
                         var eventArgs = new ValidateEventArgs()
                         {
-                            NewValue = textbox.Text,
+                            NewValue = Field.Text,
                             OldValue = _oldValue
                         };
 
                         var result = (bool)eventHandler.Method.Invoke(
-                                eventHandler.Target, new object[] { _column, eventArgs });
+                                eventHandler.Target, new object[] { this, eventArgs });
 
                         if (result == false)
                             return result;
@@ -291,12 +319,33 @@ namespace EditCellDataGrid
         {
             Type type = _column.GetType();
 
-            var field = type.GetField("Validation", BindingFlags.NonPublic | BindingFlags.Instance);
+            var field = type.GetField("EventValidation", BindingFlags.NonPublic | BindingFlags.Instance);
             if (field == null)
                 return null;
 
             var eventDelegate = field.GetValue(_column) as MulticastDelegate;
             return eventDelegate;
+        }
+
+        private string OnEventF2EventHandler()
+        {
+            Type type = _column.GetType();
+
+            var field = type.GetField("EventF2EventHandler", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (field == null)
+                return string.Empty;
+
+            var eventDelegate = field.GetValue(_column) as MulticastDelegate;
+            if (eventDelegate == null)
+                return string.Empty;
+
+            var eventHandler = eventDelegate.GetInvocationList().FirstOrDefault();
+            if (eventHandler == null)
+                return string.Empty;
+
+            var result = (string)eventHandler.Method.Invoke(
+                    eventHandler.Target, new object[] { this, EventArgs.Empty });
+            return result;
         }
     }
 }

@@ -1,10 +1,10 @@
 ﻿using EditCellDataGrid.EventsArgs;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows;
+using System.Linq;
+using System;
 
 namespace EditCellDataGrid
 {
@@ -40,13 +40,8 @@ namespace EditCellDataGrid
             dgv.MangerEdit<Produto>();
         }
 
-        protected override void OnActivated(EventArgs e)
-        {
-            base.OnActivated(e);
-        }
-
         /// <summary>
-        /// Validation example column Id
+        /// EventValidation example column Id
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -59,13 +54,13 @@ namespace EditCellDataGrid
             var checkout = items.FirstOrDefault(c => c.Id == e.NewValue.ToString().CastToInt16());
             if (checkout == null)
                 return true;
+
             return Message("Id já existe na lista");
-        }        
+        }
 
         private void DataGridTextColumnEditCell_DefineNewValue(object sender, EditCellEventArgs result)
         {
-            var item = dgv.SelectedItem as Produto;
-            item.Price = Convert.ToDecimal(result.NewValue);
+            //MessageBox.Show("Evento valor definido Ok");
         }
 
         private bool Message(string message, MessageBoxImage messageBoxImage = MessageBoxImage.Information)
@@ -76,10 +71,16 @@ namespace EditCellDataGrid
 
         private void DataGridTextColumnEditCell_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if(e.Key == Key.F2)
+            if (e.Key == Key.F2)
             {
                 MessageBox.Show("Abra sua consulta aqui", "Atenção");
             }
+        }
+
+        private string TextColumnEdit_EventF2EventHandler(object sender, EventArgs e)
+        {
+            MessageBox.Show("Event F2 acionado", "Atenção");
+            return string.Empty;
         }
     }
 }

@@ -57,6 +57,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Delegates\EditCellF2EventHandler.cs" />
     <Compile Include="Delegates\EditCellValidationEventHandler.cs" />
     <Compile Include="Delegates\DefineNewValueEventHandler.cs" />
     <Compile Include="DataGridCellEdit.cs" />
@@ -75,6 +76,7 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Compile Include="Extenders\TextBoxDecimal.cs" />
+    <Compile Include="Helpers\CheckTypeWithInputText.cs" />
     <Compile Include="Helpers\DataGridHelpers.cs" />
     <Compile Include="EditCell.xaml.cs">
       <DependentUpon>EditCell.xaml</DependentUpon>
@@ -103,6 +105,9 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Validations\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

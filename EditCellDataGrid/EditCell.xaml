@@ -3,9 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         SizeToContent="WidthAndHeight" Width="100" WindowStyle="None" ShowInTaskbar="False" AllowsTransparency="True"
         >
-    <Border x:Name="borderMain" BorderBrush="Teal" BorderThickness="2" MouseLeftButtonDown="StackPanel_MouseLeftButtonDown">
-        <StackPanel Margin="2,10,2,10">
-            <TextBlock x:Name="lblRotulo" Text="Label" Height="auto"/>
+    <Border x:Name="borderMain" BorderBrush="Teal" BorderThickness="1" MouseLeftButtonDown="StackPanel_MouseLeftButtonDown">
+        <StackPanel Margin="0">
+            <TextBlock x:Name="lblRotulo" Text="Label" Height="Auto" Visibility="Collapsed"/>
             <StackPanel x:Name="stkTextBox">
             </StackPanel>
         </StackPanel>

@@ -1,20 +1,25 @@
-﻿using System.Windows.Controls;
+﻿using EditCellDataGrid.EventsArgs;
+using EditCellDataGrid.Helpers;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Reflection;
 using System.Windows;
 using System;
 using EditCellDataGrid.Extenders;
-using EditCellDataGrid.EventsArgs;
 
 namespace EditCellDataGrid
 {
     public class DataGridCellEdit<T> where T : class, new()
     {
+        private DataGrid _datagrid = null;
         private bool _beginEdit = false;
+        private DataGridTextColumn _column;
 
         public void BeginEdit(DataGrid dataGrid, bool defineCellStyle = true)
         {
+            _datagrid = dataGrid;
+
             if (_beginEdit == true)
                 throw new Exception("Execute BeginEdit just once");
 
@@ -32,15 +37,16 @@ namespace EditCellDataGrid
         {
             e.Cancel = true;
 
-            var dataGrid = sender as DataGrid;
-            var selectedItem = dataGrid.SelectedItem;
+            var selectedItem = _datagrid.SelectedItem;
 
-            var rowSelected = dataGrid.GetSelectedRow();
-            var cellSelected = dataGrid.GetCell(rowSelected, dataGrid.CurrentColumn.DisplayIndex);
+            var rowSelected = _datagrid.GetSelectedRow();
+            var cellSelected = _datagrid.GetCell(rowSelected, _datagrid.CurrentColumn.DisplayIndex);
 
             var textBlock = (cellSelected.Content as TextBlock);
             var value = textBlock.Text;
             var typeInput = TypeInput.F2Native;
+            var property = GetProperty(_datagrid, e);
+            _column = e.Column as DataGridTextColumn;
 
             // F2(nativo)
             if (e.EditingEventArgs == null)
@@ -62,37 +68,57 @@ namespace EditCellDataGrid
                 typeInput = TypeInput.MouseDevice;
             }
 
-            var property = GetProperty(dataGrid, e);
-            var view = new EditCell(Window.GetWindow(dataGrid), textBlock.Text, value, typeInput, e.Column, property.PropertyType);
-            view.DefineStyleTextBox(dataGrid, rowSelected);
-
-            _column = e.Column as DataGridTextColumn;
-            view.textbox.PreviewKeyDown += FieldPreviewKeyDown;
-            view.lblRotulo.Text = e.Column.Header.ToString();
-
-            DefinePosition(cellSelected, rowSelected, view);
-
-            var result = view.Get();
-            if (result.Success)
+            if (CheckInput(property.PropertyType, value, typeInput) == false)
             {
-                if (result.Changes)
-                {
-                    var eventArgs = new EditCellEventArgs()
-                    {
-                        Row = rowSelected,
-                        Cell = cellSelected,
-                        NewValue = result.NewValue,
-                        OldValue = result.OldValue
-                    };
+                _datagrid.CancelEdit();
+                _datagrid.CommitEdit();
+            }
+            else
+            {
+                var view = new EditCell(Window.GetWindow(_datagrid), textBlock.Text, value, typeInput, e.Column, property.PropertyType);
+                view.DefineStyleTextBox(_datagrid, rowSelected);
+                
+                view.Field.PreviewKeyDown += FieldPreviewKeyDown;
+                view.lblRotulo.Text = e.Column.Header.ToString();
 
-                    if (OnDefineNewValue(e.Column as DataGridTextColumn, eventArgs) == false)
+                DefinePosition(cellSelected, rowSelected, view);
+
+                var result = view.Input();
+                if (result.Success)
+                {
+                    if (result.Changes)
+                    {
+                        var eventArgs = new EditCellEventArgs()
+                        {
+                            Row = rowSelected,
+                            Cell = cellSelected,
+                            NewValue = result.NewValue,
+                            OldValue = result.OldValue
+                        };
+
                         property.SetValue(selectedItem, Convert.ChangeType(result.NewValue, property.PropertyType));
 
-                    OnNewValueConfirmed(e.Column as DataGridTextColumn, eventArgs);
+                        OnNewValueConfirmed(e.Column as DataGridTextColumn, eventArgs);
+                    }
+
+                    if (result.PressedEnter)
+                        _datagrid.MoveNextRow();
                 }
-                if (result.PressedEnter)
-                    dataGrid.MoveNextRow();
             }
+        }
+
+        private bool CheckInput(Type type, string value, TypeInput typeInput)
+        {
+            if (typeInput != TypeInput.KeyboardDevice)
+                return true;
+
+            // se é mascarada, então só pode números
+            if (_column as TextColumnEditMask != null)
+                return long.TryParse(value, out _);
+
+            if (CheckTypeWithInputText.CheckStartInputNumberValid(type, value) == false)
+                return false;
+            return true;
         }
 
         private void FieldPreviewKeyDown(object sender, KeyEventArgs e)
@@ -106,7 +132,7 @@ namespace EditCellDataGrid
 
             Type type = _column.GetType();
 
-            var field = type.GetField("PreviewKeyDown", BindingFlags.NonPublic | BindingFlags.Instance);
+            var field = type.GetField("EventPreviewKeyDown", BindingFlags.NonPublic | BindingFlags.Instance);
             if (field == null) return false;
 
             var eventDelegate = field.GetValue(_column) as MulticastDelegate;
@@ -125,40 +151,13 @@ namespace EditCellDataGrid
             return true;
         }
 
-        private DataGridTextColumn _column;
-
-        public bool OnDefineNewValue(DataGridTextColumn column, EditCellEventArgs eventArgs)
-        {
-            if (column == null) return false;
-
-            Type type = column.GetType();
-
-            var field = type.GetField("DefineNewValue", BindingFlags.NonPublic | BindingFlags.Instance);
-            if (field == null) return false;
-
-            var eventDelegate = field.GetValue(column) as MulticastDelegate;
-            if (eventDelegate == null)
-                return false;
-
-            var events = eventDelegate.GetInvocationList();
-            if (events.Length == 0)
-                return false;
-
-            foreach (var eventHandler in events)
-            {
-                eventHandler.Method.Invoke(
-                        eventHandler.Target, new object[] { column, eventArgs });
-            }
-            return true;
-        }
-
         public bool OnNewValueConfirmed(DataGridTextColumn column, EditCellEventArgs eventArgs)
         {
             if (column == null) return false;
 
             Type type = column.GetType();
 
-            var field = type.GetField("NewValueConfirmed", BindingFlags.NonPublic | BindingFlags.Instance);
+            var field = type.GetField("EventNewValueConfirmed", BindingFlags.NonPublic | BindingFlags.Instance);
             if (field == null) return false;
 
             var eventDelegate = field.GetValue(column) as MulticastDelegate;
@@ -183,7 +182,7 @@ namespace EditCellDataGrid
         /// <param name="dataGrid"></param>
         private void DefineCellStyle(DataGrid dataGrid)
         {
-            MultiTrigger multiTrigger = new MultiTrigger();
+            var multiTrigger = new MultiTrigger();
 
             // rules
             multiTrigger.Conditions.Add(new Condition(DataGridCell.IsKeyboardFocusWithinProperty, true));
@@ -191,11 +190,11 @@ namespace EditCellDataGrid
 
             multiTrigger.Setters.Add(new Setter(DataGridCell.BorderThicknessProperty, new Thickness(1)));
             multiTrigger.Setters.Add(new Setter(DataGridCell.FocusVisualStyleProperty, null));
-            multiTrigger.Setters.Add(new Setter(DataGridCell.BorderBrushProperty, new SolidColorBrush(Colors.Red)));
+            multiTrigger.Setters.Add(new Setter(DataGridCell.BorderBrushProperty, new SolidColorBrush(Colors.Teal)));
             multiTrigger.Setters.Add(new Setter(DataGridCell.ForegroundProperty, new SolidColorBrush(Colors.Black)));
-            multiTrigger.Setters.Add(new Setter(DataGridCell.BackgroundProperty, new SolidColorBrush(Colors.White)));
+            multiTrigger.Setters.Add(new Setter(DataGridCell.BackgroundProperty, new SolidColorBrush(Colors.LightGray)));
 
-            Style style = new Style();
+            var style = new Style();
             style.Triggers.Add(multiTrigger);
 
             dataGrid.CellStyle = style;
@@ -209,26 +208,19 @@ namespace EditCellDataGrid
         /// <param name="view"></param>
         private void DefinePosition(DataGridCell cellSelected, DataGridRow rowSelected, Window view)
         {
-            var scaler = GetWindowsScaling();
             view.MinWidth = cellSelected.ActualWidth;// + 20;
 
-            if (scaler == 100)
-            {
-                var screenCoordinates = cellSelected.PointToScreen(new Point(0, 0));
-                view.Left = screenCoordinates.X;
+            var source = PresentationSource.FromVisual(cellSelected);
+            var dpiX = 96.0 * source.CompositionTarget.TransformToDevice.M11;
+            var dpiY = 96.0 * source.CompositionTarget.TransformToDevice.M22;
 
-                var pointRow = rowSelected.PointToScreen(new Point(0, 0));
-                view.Top = pointRow.Y - 27;//-27; joga um pouco pra cima
-            }
-            else
-            {
-                view.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            }
-        }
+            var scalingFactorX = dpiX / 96.0;
+            var scalingFactorY = dpiY / 96.0;
 
-        public static int GetWindowsScaling()
-        {
-            return (int)(100 * System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width / SystemParameters.PrimaryScreenWidth);
+            var coordinate = cellSelected.PointToScreen(new Point(0, 0));
+
+            view.Left = coordinate.X / scalingFactorX;
+            view.Top = (coordinate.Y / scalingFactorY) - 1;// - 19;//-27; move um pouco pra cima
         }
 
         /// <summary>
