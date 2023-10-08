@@ -1,4 +1,6 @@
-﻿namespace System
+﻿using System;
+
+namespace EditCellDataGrid.Extensions
 {
     public static class IntegerExtensions
     {

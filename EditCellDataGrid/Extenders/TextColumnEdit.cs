@@ -8,7 +8,7 @@ namespace EditCellDataGrid.Extenders
     public class TextColumnEdit : DataGridTextColumn
     {
         public event EditCellValidationEventHandler EventValidation;
-        public event NewValueConfirmedEventHandler EventNewValueConfirmed;
+        public event NewValueConfirmedEventHandler EventCellValueChanged;
         public event EditCellF2EventHandler EventF2EventHandler;
 
         public static int MaxLengthDefault = 9999;
@@ -27,7 +27,7 @@ namespace EditCellDataGrid.Extenders
     public class TextColumnEditDecimal : TextColumnEdit
     {
         public event EditCellValidationEventHandler EventValidation;
-        public event NewValueConfirmedEventHandler EventNewValueConfirmed;
+        public event NewValueConfirmedEventHandler EventCellValueChanged;
         public event EditCellF2EventHandler EventF2EventHandler;
 
         public int Decimais
@@ -44,21 +44,21 @@ namespace EditCellDataGrid.Extenders
     public class TextColumnEditDate : TextColumnEdit
     {
         public event EditCellValidationEventHandler EventValidation;
-        public event NewValueConfirmedEventHandler EventNewValueConfirmed;
+        public event NewValueConfirmedEventHandler EventCellValueChanged;
         public event EditCellF2EventHandler EventF2EventHandler;
     }
 
     public class TextColumnEditInteger : TextColumnEdit
     {
         public event EditCellValidationEventHandler EventValidation;
-        public event NewValueConfirmedEventHandler EventNewValueConfirmed;
+        public event NewValueConfirmedEventHandler EventCellValueChanged;
         public event EditCellF2EventHandler EventF2EventHandler;
     }
 
     public class TextColumnEditMask : TextColumnEdit
     {
         public event EditCellValidationEventHandler EventValidation;
-        public event NewValueConfirmedEventHandler EventNewValueConfirmed;
+        public event NewValueConfirmedEventHandler EventCellValueChanged;
         public event EditCellF2EventHandler EventF2EventHandler;
 
         public string Mask

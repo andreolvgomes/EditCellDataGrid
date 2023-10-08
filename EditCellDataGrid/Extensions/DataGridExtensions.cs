@@ -1,13 +1,16 @@
-﻿using EditCellDataGrid;
+﻿using EditCellDataGrid.Extensions;
 using System.Windows.Input;
+using EditCellDataGrid;
 
 namespace System.Windows.Controls
 {
     public static class DataGridExtensions
     {
-        public static void MangerEdit<T>(this DataGrid dataGrid) where T : class, new()
+        public static DataGridCellEdit<T> MangerEdit<T>(this DataGrid dataGrid) where T : class, new()
         {
-            new DataGridCellEdit<T>().BeginEdit(dataGrid);
+            var dataGridCellEdit = new DataGridCellEdit<T>();
+            dataGridCellEdit.BeginEdit(dataGrid);
+            return dataGridCellEdit;
         }
 
         public static void MoveNextRow(this DataGrid dataGrid)
@@ -31,7 +34,7 @@ namespace System.Windows.Controls
             }));
         }
 
-        public static void FocusDataGridCell(this DataGrid dataGrid, int column)
+        private static void FocusDataGridCell(this DataGrid dataGrid, int column)
         {
             if (dataGrid.IsKeyboardFocusWithin && dataGrid.SelectedItem != null)
             {
@@ -44,6 +47,11 @@ namespace System.Windows.Controls
                 if (cell != null)
                     cell.Focus();
             }
+        }
+
+        public static void SetStyle(this DataGrid datagrid, Style style)
+        {
+            datagrid.StyleCell(style);
         }
     }
 }

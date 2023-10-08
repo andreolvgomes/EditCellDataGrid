@@ -1,4 +1,5 @@
-﻿using EditCellDataGrid.EventsArgs;
+﻿using EditCellDataGrid.Extensions;
+using EditCellDataGrid.EventsArgs;
 using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -37,7 +38,16 @@ namespace EditCellDataGrid
 
             dgv.ItemsSource = new List<Produto>();
             dgv.ItemsSource = items;
-            dgv.MangerEdit<Produto>();
+
+            var dataGridCellEdit = dgv.MangerEdit<Produto>();
+            dataGridCellEdit.EventDataGridValueChanged += DataGridValueChanged;
+
+            sliderFontSize.Value = dgv.FontSize;
+        }
+
+        private void DataGridValueChanged(object sender, DataGridlValueChangedEventArgs<Produto> e)
+        {
+            
         }
 
         /// <summary>

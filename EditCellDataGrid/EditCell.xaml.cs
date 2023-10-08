@@ -8,12 +8,13 @@ using System.Windows;
 using System.Linq;
 using System;
 using EditCellDataGrid.Helpers;
+using EditCellDataGrid.Extensions;
 
 namespace EditCellDataGrid
 {
     public class Result
     {
-        public bool PressedEnter { get; set; }
+        public bool KeyEnterPressed { get; set; }
         public bool Success { get; set; }
         public bool Changes { get; set; }
         public string NewValue { get; set; }
@@ -75,8 +76,8 @@ namespace EditCellDataGrid
         protected override void OnActivated(EventArgs e)
         {
             base.OnActivated(e);
-            borderMain.BorderBrush = new SolidColorBrush(Colors.Teal);
-            borderMain.BorderThickness = new Thickness(1);
+            //borderMain.BorderBrush = new SolidColorBrush(Colors.Teal);
+            //borderMain.BorderThickness = new Thickness(1);
         }
 
         protected override void OnDeactivated(EventArgs e)
@@ -124,14 +125,17 @@ namespace EditCellDataGrid
             return textbox;
         }
 
-        internal void DefineStyleTextBox(DataGrid dataGrid, DataGridRow dataGridRow)
+        internal void SettingsField(DataGrid dataGrid, DataGridRow dataGridRow, string header)
         {
+            lblRotulo.Text = header;
+            
             Field.FontSize = dataGrid.FontSize;
             Field.Foreground = dataGrid.Foreground;
             Field.FontWeight = dataGrid.FontWeight;
             Field.FontFamily = dataGrid.FontFamily;
+
             if (dataGridRow.ActualHeight > 0)
-                Field.Height = dataGridRow.ActualHeight;
+                Field.Height = dataGridRow.ActualHeight-3;
         }
 
         private TextBox FieldEditCustom(TextColumnEdit column)
@@ -204,7 +208,7 @@ namespace EditCellDataGrid
             ShowDialog();
             return new Result()
             {
-                PressedEnter = pressedEnter,
+                KeyEnterPressed = pressedEnter,
                 Success = success,
                 NewValue = Field.Text,
                 OldValue = _oldValue.ToString(),

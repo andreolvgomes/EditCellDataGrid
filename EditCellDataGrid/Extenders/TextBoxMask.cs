@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System;
 using System.Windows.Controls;
+using EditCellDataGrid.Extensions;
 
 namespace EditCellDataGrid.Extenders
 {

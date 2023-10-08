@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace System
+namespace EditCellDataGrid.Extensions
 {
     public static class DecimalExtensions
     {
