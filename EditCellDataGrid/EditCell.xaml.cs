@@ -128,14 +128,14 @@ namespace EditCellDataGrid
         internal void SettingsField(DataGrid dataGrid, DataGridRow dataGridRow, string header)
         {
             lblRotulo.Text = header;
-            
+
             Field.FontSize = dataGrid.FontSize;
             Field.Foreground = dataGrid.Foreground;
             Field.FontWeight = dataGrid.FontWeight;
             Field.FontFamily = dataGrid.FontFamily;
 
             if (dataGridRow.ActualHeight > 0)
-                Field.Height = dataGridRow.ActualHeight-3;
+                Field.Height = dataGridRow.ActualHeight;
         }
 
         private TextBox FieldEditCustom(TextColumnEdit column)
