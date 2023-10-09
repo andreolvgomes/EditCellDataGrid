@@ -1,10 +1,10 @@
 ﻿using EditCellDataGrid.EventsArgs;
 using EditCellDataGrid.Extensions;
+using EditCellDataGrid.Delegates;
 using System.Windows.Controls;
 using System.Reflection;
 using System.Windows;
 using System;
-using EditCellDataGrid.Delegates;
 
 namespace EditCellDataGrid
 {
@@ -38,6 +38,8 @@ namespace EditCellDataGrid
         private void OnBeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
             e.Cancel = true;
+            if (_datagrid.CurrentColumn as DataGridTemplateColumn != null)
+                return;
 
             ModelSelected = _datagrid.SelectedItem;
 

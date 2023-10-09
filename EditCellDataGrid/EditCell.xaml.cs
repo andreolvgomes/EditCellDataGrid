@@ -1,5 +1,7 @@
-﻿using EditCellDataGrid.EventsArgs;
+﻿using EditCellDataGrid.Extensions;
+using EditCellDataGrid.EventsArgs;
 using EditCellDataGrid.Extenders;
+using EditCellDataGrid.Helpers;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -7,8 +9,6 @@ using System.Reflection;
 using System.Windows;
 using System.Linq;
 using System;
-using EditCellDataGrid.Helpers;
-using EditCellDataGrid.Extensions;
 
 namespace EditCellDataGrid
 {
@@ -70,14 +70,8 @@ namespace EditCellDataGrid
             Field.CharacterCasing = CharacterCasing.Upper;
             Field.Name = "txtEdit";
             Field.PreviewKeyDown += new KeyEventHandler(textbox_PreviewKeyDown);
+            Field.Style = FindResource("StyleTextBox") as Style;
             stkTextBox.Children.Add(Field);
-        }
-
-        protected override void OnActivated(EventArgs e)
-        {
-            base.OnActivated(e);
-            //borderMain.BorderBrush = new SolidColorBrush(Colors.Teal);
-            //borderMain.BorderThickness = new Thickness(1);
         }
 
         protected override void OnDeactivated(EventArgs e)
@@ -85,8 +79,6 @@ namespace EditCellDataGrid
             base.OnDeactivated(e);
             if (closed == false && validating == false && f2pressed == false)
             {
-                //borderMain.BorderBrush = new SolidColorBrush(Colors.Red);
-                //borderMain.BorderThickness = new Thickness(2);
                 if (ValidCloseInDeactivated())
                 {
                     ConfirmedChanges();
@@ -105,24 +97,25 @@ namespace EditCellDataGrid
 
         private TextBox GetField()
         {
-            var textbox = new TextBox();
             if (_column as TextColumnEdit is null)
             {
                 if (_propertyType == typeof(decimal))
-                    textbox = new TextBoxDecimal() { QuantityDecimais = Decimais(_oldValue) };
+                    return new TextBoxDecimal() { QuantityDecimais = Decimais(_oldValue) };
                 else if (_propertyType == typeof(DateTime))
-                    textbox = new TextBoxDate();
+                    return new TextBoxDate();
                 else if (_propertyType == typeof(int) || _propertyType == typeof(Int16) || _propertyType == typeof(Int32) || _propertyType == typeof(Int64))
-                    textbox = new TextBoxInt();
+                    return new TextBoxInt();
             }
             else
             {
-                textbox = FieldEditCustom(_column as TextColumnEdit);
+                var textbox = FieldEditCustom(_column as TextColumnEdit);
                 var col = _column as TextColumnEdit;
                 if (col.MaxLength != TextColumnEdit.MaxLengthDefault)
                     textbox.MaxLength = col.MaxLength;
+
+                return textbox;
             }
-            return textbox;
+            return new TextBoxMask() { IgnoreMask = true };
         }
 
         internal void SettingsField(DataGrid dataGrid, DataGridRow dataGridRow, string header)
@@ -135,7 +128,7 @@ namespace EditCellDataGrid
             Field.FontFamily = dataGrid.FontFamily;
 
             if (dataGridRow.ActualHeight > 0)
-                Field.Height = dataGridRow.ActualHeight;
+                Field.Height = dataGridRow.ActualHeight;// - 2;
         }
 
         private TextBox FieldEditCustom(TextColumnEdit column)
@@ -163,7 +156,7 @@ namespace EditCellDataGrid
             else if (_propertyType == typeof(int) || _propertyType == typeof(Int16) || _propertyType == typeof(Int32) || _propertyType == typeof(Int64))
                 return new TextBoxInt();
 
-            return new TextBox();
+            return new TextBoxMask() { IgnoreMask = true };
         }
 
         private int Decimais(object oldValue)
