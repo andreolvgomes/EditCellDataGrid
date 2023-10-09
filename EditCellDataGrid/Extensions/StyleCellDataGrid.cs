@@ -30,15 +30,22 @@ namespace EditCellDataGrid.Extensions
             multiTrigger.Setters.Add(new Setter(DataGridCell.ForegroundProperty, new SolidColorBrush(Colors.Black)));
             multiTrigger.Setters.Add(new Setter(DataGridCell.BackgroundProperty, new SolidColorBrush(Colors.White)));
 
-            var style = new Style();
-            style.Triggers.Add(multiTrigger);
-
-            datagrid.SetStyle(style);
+            datagrid.StyleCellMultiTrigger(multiTrigger);
         }
 
         public static void StyleCell(this DataGrid datagrid, Style style)
         {
             datagrid.CellStyle = style;
+        }
+
+        public static void StyleCellMultiTrigger(this DataGrid datagrid, MultiTrigger multiTrigger)
+        {
+            if (datagrid.CellStyle == null)
+            {
+                var style = new Style();
+                datagrid.CellStyle = style;
+            }
+            datagrid.CellStyle.Triggers.Add(multiTrigger);
         }
     }
 }

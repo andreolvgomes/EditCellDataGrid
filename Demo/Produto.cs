@@ -5,6 +5,21 @@ namespace EditCellDataGrid
 {
     public class Produto : INotifyPropertyChanged
     {
+        private bool _IsChecked;
+
+        public bool IsChecked
+        {
+            get { return _IsChecked; }
+            set
+            {
+                if (_IsChecked != value)
+                {
+                    _IsChecked = value;
+                    OnPropertyChanged("IsChecked");
+                }
+            }
+        }
+
         private int _Id;
 
         public int Id

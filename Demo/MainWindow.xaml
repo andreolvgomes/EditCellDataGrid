@@ -26,7 +26,25 @@
 
         <DataGrid x:Name="dgv" Grid.Row="2" Background="White" AutoGenerateColumns="False" IsReadOnly="False" FontSize="{Binding ElementName=sliderFontSize, Path=Value}"
                   CanUserReorderColumns="True" CanUserResizeRows="True">
+            <!--<DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsChecked}" Value="True">
+                            <Setter Property="Background" Value="Gray"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.CellStyle>-->
             <DataGrid.Columns>
+                <!--<DataGridTemplateColumn Width="30">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <CheckBox Content="" IsChecked="{Binding IsChecked, UpdateSourceTrigger=PropertyChanged}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>-->
                 <extenders:TextColumnEdit Header="Código" Binding="{Binding Id}" EventValidation="DataGridTextColumn_ValidationEdit" MaxLength="5"
                                           EventF2EventHandler="TextColumnEdit_EventF2EventHandler"/>
                 <DataGridTextColumn Header="Descrição" Width="300" Binding="{Binding Description}" IsReadOnly="True"/>
