@@ -19,10 +19,11 @@ namespace EditCellDataGrid.Extenders
                 if (!(this.Text.Length < this.MaxLength))
                     prossegue = false;
 
+            bool valid = ValidaCaracter(e.Text);
+            e.Handled = !valid;
+
             if (prossegue)
             {
-                bool valid = ValidaCaracter(e.Text);
-                e.Handled = !valid;
                 if (valid)
                 {
                     int _selectionStart = 0;

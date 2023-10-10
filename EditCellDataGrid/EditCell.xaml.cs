@@ -81,8 +81,10 @@ namespace EditCellDataGrid
             {
                 if (ValidCloseInDeactivated())
                 {
-                    ConfirmedChanges();
-                    Close();
+                    Owner.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        ConfirmedChanges();
+                    }));
                 }
             }
         }
@@ -175,7 +177,11 @@ namespace EditCellDataGrid
             if (e.Key == Key.Escape)
             {
                 closed = true;
-                Close();
+                Owner.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    Close();
+                    Owner.Activate();
+                }));
             }
             else if (e.Key == Key.F2)
             {
@@ -209,28 +215,41 @@ namespace EditCellDataGrid
             };
         }
 
+        public Result Get()
+        {
+            return new Result()
+            {
+                KeyEnterPressed = pressedEnter,
+                Success = success,
+                NewValue = Field.Text,
+                OldValue = _oldValue.ToString(),
+                Changes = !Field.Text.Equals(_oldValue)
+            };
+        }
+
         private void textbox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
                 e.Handled = true;
                 pressedEnter = true;
-                ConfirmedChanges();
+                TryConfirmedChanges();
             }
+        }
+
+        private void TryConfirmedChanges()
+        {
+            if (Valid() == false)
+                Field.DefineFocusSelectAll();
+            else
+                ConfirmedChanges();
         }
 
         private void ConfirmedChanges()
         {
-            if (Valid() == false)
-            {
-                Field.DefineFocusSelectAll();
-            }
-            else
-            {
-                success = true;
-                closed = true;
-                Close();
-            }
+            success = true;
+            closed = true;
+            Close();
         }
 
         private bool Valid()

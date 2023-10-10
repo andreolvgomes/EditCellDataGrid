@@ -11,16 +11,26 @@ namespace EditCellDataGrid
     public class DataGridCellEdit<T> where T : class, new()
     {
         public event DataGridlValueChangedEventHanddler<T> EventDataGridValueChanged;
-        private object ModelSelected;
-        private string FieldName;
 
+        private object modelSelected;
+        private string fieldName;
+
+        private PropertyInfo property;
+        private DataGridRow rowSelected;
+        private DataGridCell cellSelected;
+        private EditCell view;
+
+        private bool closedOwner = false;
+        private Window owner = null;
         private DataGrid _datagrid = null;
         private bool _beginEdit = false;
-        private DataGridTextColumn _column;
+        private DataGridTextColumn column;
 
         public void BeginEdit(DataGrid dataGrid, bool defineCellStyle = true)
         {
             _datagrid = dataGrid;
+            owner = Window.GetWindow(_datagrid);
+            owner.Closed += OwnerClosed;
 
             if (_beginEdit == true)
                 throw new Exception("Execute BeginEdit just once");
@@ -32,25 +42,36 @@ namespace EditCellDataGrid
                 dataGrid.CreateStyleCell();
 
             dataGrid.BeginningEdit += new EventHandler<DataGridBeginningEditEventArgs>(OnBeginningEdit);
-            _beginEdit = true;
+            _beginEdit = true;            
+        }
+
+        private void OwnerClosed(object sender, EventArgs e)
+        {
+            closedOwner = true;
+            if (view != null)
+            {
+                view.Close();
+                view = null;
+            }
         }
 
         private void OnBeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
             e.Cancel = true;
+
             if (_datagrid.CurrentColumn as DataGridTemplateColumn != null)
                 return;
 
-            ModelSelected = _datagrid.SelectedItem;
+            modelSelected = _datagrid.SelectedItem;
 
-            var rowSelected = _datagrid.GetSelectedRow();
-            var cellSelected = _datagrid.GetCell(rowSelected, _datagrid.CurrentColumn.DisplayIndex);
+            rowSelected = _datagrid.GetSelectedRow();
+            cellSelected = _datagrid.GetCell(rowSelected, _datagrid.CurrentColumn.DisplayIndex);
+            property = GetProperty(_datagrid, e);
+            column = e.Column as DataGridTextColumn;
 
             var textBlock = (cellSelected.Content as TextBlock);
             var value = textBlock.Text;
             var typeInput = TypeInput.F2Native;
-            var property = GetProperty(_datagrid, e);
-            _column = e.Column as DataGridTextColumn;
 
             // F2(nativo)
             if (e.EditingEventArgs == null)
@@ -79,18 +100,31 @@ namespace EditCellDataGrid
             }
             else
             {
-                var view = new EditCell(Window.GetWindow(_datagrid), textBlock.Text, value, typeInput, e.Column, property.PropertyType);
+                if (view != null)
+                    view.Close();
+
+                view = new EditCell(owner, textBlock.Text, value, typeInput, e.Column, property.PropertyType);
                 view.SettingsField(_datagrid, rowSelected, e.Column.Header.ToString());
 
                 view.MinWidth = cellSelected.ActualWidth;
                 view.DefinePosition(cellSelected);
+                view.Closed += InputClosed;
+                view.Show();
+            }
+        }
 
-                var result = view.Input();
+        private void InputClosed(object sender, EventArgs e)
+        {
+            if (closedOwner == false)
+            {
+                view = null;
+                var input = sender as EditCell;
+                var result = input.Get();
                 if (result.Success)
                 {
                     if (result.Changes)
                     {
-                        property.SetValue(ModelSelected, Convert.ChangeType(result.NewValue, property.PropertyType));
+                        property.SetValue(modelSelected, Convert.ChangeType(result.NewValue, property.PropertyType));
 
                         OnNewValueConfirmed(rowSelected, cellSelected, result);
                         OnEventDataGridValueChanged(rowSelected, cellSelected, result);
@@ -108,11 +142,11 @@ namespace EditCellDataGrid
             {
                 EventDataGridValueChanged(this, new DataGridlValueChangedEventArgs<T>()
                 {
-                    Entity = (T)ModelSelected,
-                    Column = _column,
+                    Entity = (T)modelSelected,
+                    Column = column,
                     Row = dataGridRow,
                     Cell = dataGridCell,
-                    FieldName = FieldName,
+                    FieldName = fieldName,
                     OldValue = result.OldValue,
                     NewValue = result.NewValue
                 });
@@ -124,7 +158,7 @@ namespace EditCellDataGrid
             if (typeInput != TypeInput.KeyboardDevice)
                 return true;
 
-            if (_column.CheckColInputIsNumber(type))
+            if (column.CheckColInputIsNumber(type))
                 return long.TryParse(value, out _);
 
             return true;
@@ -140,14 +174,14 @@ namespace EditCellDataGrid
                 OldValue = result.OldValue
             };
 
-            if (_column== null) return false;
+            if (column == null) return false;
 
-            Type type = _column.GetType();
+            Type type = column.GetType();
 
             var field = type.GetField("EventCellValueChanged", BindingFlags.NonPublic | BindingFlags.Instance);
             if (field == null) return false;
 
-            var eventDelegate = field.GetValue(_column) as MulticastDelegate;
+            var eventDelegate = field.GetValue(column) as MulticastDelegate;
             if (eventDelegate == null)
                 return false;
 
@@ -158,7 +192,7 @@ namespace EditCellDataGrid
             foreach (var eventHandler in events)
             {
                 eventHandler.Method.Invoke(
-                        eventHandler.Target, new object[] { _column, eventArgs });
+                        eventHandler.Target, new object[] { column, eventArgs });
             }
             return true;
         }
@@ -175,8 +209,8 @@ namespace EditCellDataGrid
             if (binding == null)
                 throw new Exception($"'{e.Column.Header}'... binding is null, not allowed.. define IsReadOnly=True");
 
-            FieldName = ((System.Windows.Data.Binding)binding).Path.Path;
-            var property = dataGrid.SelectedItem.GetType().GetProperty(FieldName);
+            fieldName = ((System.Windows.Data.Binding)binding).Path.Path;
+            var property = dataGrid.SelectedItem.GetType().GetProperty(fieldName);
             return property;
         }
     }

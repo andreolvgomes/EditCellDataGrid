@@ -54,7 +54,6 @@
                 <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat={}{0:n2}, ConverterCulture=pt-br}" Width="100"/>
                 <DataGridTextColumn Header="Sem Binding(Error)" Width="100"/>
                 <DataGridTextColumn Header="Data" Binding="{Binding Date, StringFormat={}{0:dd/MM/yyyy}, ConverterCulture=pt-br}" Width="100"/>
-                <DataGridTextColumn Header="Sem Validação" Binding="{Binding Date, StringFormat={}{0:dd/MM/yyyy}, ConverterCulture=pt-br}" Width="100"/>
                 <extenders:TextColumnEditMask Header="Mask" Mask="000.000.000-00" Binding="{Binding Cpf}" Width="100"/>
                 <DataGridTextColumn Header="Observação" Width="300" Binding="{Binding Obs}"/>
             </DataGrid.Columns>
