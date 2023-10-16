@@ -31,3 +31,31 @@ definido o result.Value em item.Price
 <p>
 	<img src="Assets/celledit-setdata.jpg">
 </p>
+
+# Testes
+>> Iniciar edição <<
+ - Digitando algo
+	Decimal, Int, Mask ou Date:
+		- Tentar digitar letras => Não deve iniciar a digitação
+		- Tentar digitar números => Deve iniciar a digitação
+	String
+		- Tentar digitar letras => Deve deve iniciar a digitação
+		- Tentar digitar números => Deve iniciar a digitação
+
+ - F2 (nativo)
+	Deve abrir o campo para edição
+
+ - Clique duplo
+	Deve abrir o campo para edição
+
+>>Confirmar mudança<<
+ - Iniciar mudança
+	Clicar em outro lugar => Deve confirmar o novo dado
+	Pressionar Enter => Deve confirmar o novo dado
+
+	Data: 
+		-informar uma data inválida
+			- Clicar em outro lugar: Não deve confirmar o novo dado, mostrar erro vermelho
+	Valor: 
+		-informar uma data inválida
+			- Clicar em outro lugar: Não deve confirmar o novo dado, mostrar erro vermelho
