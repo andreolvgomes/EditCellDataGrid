@@ -33,7 +33,7 @@ definido o result.Value em item.Price
 </p>
 
 # Testes
->> Iniciar edição <<
+>> Iniciar edição
  - Digitando algo
 	Decimal, Int, Mask ou Date:
 		- Tentar digitar letras => Não deve iniciar a digitação
@@ -48,7 +48,7 @@ definido o result.Value em item.Price
  - Clique duplo
 	Deve abrir o campo para edição
 
->>Confirmar mudança<<
+>>Confirmar mudança
  - Iniciar mudança
 	Clicar em outro lugar => Deve confirmar o novo dado
 	Pressionar Enter => Deve confirmar o novo dado
@@ -56,6 +56,7 @@ definido o result.Value em item.Price
 	Data: 
 		-informar uma data inválida
 			- Clicar em outro lugar: Não deve confirmar o novo dado, mostrar erro vermelho
+   
 	Valor: 
 		-informar uma data inválida
 			- Clicar em outro lugar: Não deve confirmar o novo dado, mostrar erro vermelho
