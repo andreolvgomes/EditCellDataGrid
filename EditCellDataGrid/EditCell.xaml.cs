@@ -30,6 +30,7 @@ namespace EditCellDataGrid
 
     public partial class EditCell : Window
     {
+        private object _entity = null;
         public TextBox Field { get; set; }
 
         private bool pressedEnter = false;
@@ -42,7 +43,7 @@ namespace EditCellDataGrid
         private readonly string _oldValue;
         private readonly Type _propertyType = null;
 
-        public EditCell(Window owner, string oldValue, string value, TypeInput typeInput, DataGridColumn column, Type propertyType)
+        public EditCell(Window owner, string oldValue, string value, TypeInput typeInput, DataGridColumn column, Type propertyType, CharacterCasing characterCasing)
         {
             InitializeComponent();
 
@@ -51,8 +52,14 @@ namespace EditCellDataGrid
             _propertyType = propertyType;
             _oldValue = oldValue;
 
-            CrateTextBox();
-            Field.Text = value.ToUpper();
+            CrateTextBox(characterCasing);
+            Field.Text = value;
+            
+            if (characterCasing == CharacterCasing.Upper)
+                Field.Text = value.ToUpper();
+            else if (characterCasing == CharacterCasing.Lower)
+                Field.Text = value.ToLower();
+
             Field.Focus();
 
             if (typeInput == TypeInput.KeyboardDevice)
@@ -63,11 +70,16 @@ namespace EditCellDataGrid
             PreviewKeyDown += new KeyEventHandler(W_PreviewKeyDown);
         }
 
-        private void CrateTextBox()
+        public void SetEntity(object entity)
+        {
+            _entity = entity;
+        }
+
+        private void CrateTextBox(CharacterCasing characterCasing)
         {
             Field = GetField();
             Field.ToolTip = "Enter - Confirmar\nEsc - Sair";
-            Field.CharacterCasing = CharacterCasing.Upper;
+            Field.CharacterCasing = characterCasing;
             Field.Name = "txtEdit";
             Field.PreviewKeyDown += new KeyEventHandler(textbox_PreviewKeyDown);
             Field.Style = FindResource("StyleTextBox") as Style;
@@ -293,7 +305,11 @@ namespace EditCellDataGrid
             {
                 validating = true;
 
-                if (_column == null) return true;
+                if (_column == null)
+                    return true;
+
+                if (Field.Text.Equals(_oldValue))
+                    return true;
 
                 var eventDelegate = GetEventDelegateValidate();
                 if (eventDelegate != null)
@@ -302,6 +318,7 @@ namespace EditCellDataGrid
                     {
                         var eventArgs = new ValidateEventArgs()
                         {
+                            Entity = _entity,
                             NewValue = Field.Text,
                             OldValue = _oldValue
                         };

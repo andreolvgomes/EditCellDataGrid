@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Reflection;
 using System.Windows;
 using System;
+using EditCellDataGrid.Extenders;
 
 namespace EditCellDataGrid
 {
@@ -42,7 +43,7 @@ namespace EditCellDataGrid
                 dataGrid.CreateStyleCell();
 
             dataGrid.BeginningEdit += new EventHandler<DataGridBeginningEditEventArgs>(OnBeginningEdit);
-            _beginEdit = true;            
+            _beginEdit = true;
         }
 
         private void OwnerClosed(object sender, EventArgs e)
@@ -103,14 +104,24 @@ namespace EditCellDataGrid
                 if (view != null)
                     view.Close();
 
-                view = new EditCell(owner, textBlock.Text, value, typeInput, e.Column, property.PropertyType);
+                var characterCasing = GetCharacterCasing();
+                view = new EditCell(owner, textBlock.Text, value, typeInput, e.Column, property.PropertyType, characterCasing);
                 view.SettingsField(_datagrid, rowSelected, e.Column.Header.ToString());
+                view.SetEntity(modelSelected);
 
                 view.MinWidth = cellSelected.ActualWidth;
                 view.DefinePosition(cellSelected);
                 view.Closed += InputClosed;
                 view.Show();
             }
+        }
+
+        private CharacterCasing GetCharacterCasing()
+        {
+            var col = column as TextColumnEdit;
+            if (col != null)
+                return col.CharacterCasing;
+            return CharacterCasing.Upper;
         }
 
         private void InputClosed(object sender, EventArgs e)

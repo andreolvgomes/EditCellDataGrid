@@ -22,6 +22,18 @@ namespace EditCellDataGrid.Extenders
         // Using a DependencyProperty as the backing store for MaxLength.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty MaxLengthProperty =
             DependencyProperty.Register("MaxLength", typeof(int), typeof(TextColumnEdit), new PropertyMetadata(MaxLengthDefault));
+
+
+        public CharacterCasing CharacterCasing
+        {
+            get { return (CharacterCasing)GetValue(CharacterCasingProperty); }
+            set { SetValue(CharacterCasingProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for CharacterCasing.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty CharacterCasingProperty =
+            DependencyProperty.Register("CharacterCasing", typeof(CharacterCasing), typeof(TextColumnEdit), new PropertyMetadata(CharacterCasing.Upper));
+
     }
 
     public class TextColumnEditDecimal : TextColumnEdit
