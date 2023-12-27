@@ -7,7 +7,7 @@ setar o novo dado confirmado pelo usuário, ter o textbox de edição formatado 
 
 No construtor da Window, execute, por exemplo: **new DataGridCellEdit<Produto>().BeginEdit(datagrid);**
 <p>
-	<img src="Assets/celledit-field.png">
+	<img src="Assets/celledit-field.PNG">
 </p>
 
 ## Validação personalizada
@@ -17,7 +17,7 @@ validação para cada uma das colunas(campo).
 ### Exemplo:
 Mudar o Id 4 para 1
 <p>
-	<img src="Assets/celledit-validation.png">
+	<img src="Assets/celledit-validation.PNG">
 </p>
 
 ## Definir novo Dado na propriedade da classe
