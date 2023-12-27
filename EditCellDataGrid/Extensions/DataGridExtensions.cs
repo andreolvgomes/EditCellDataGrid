@@ -6,7 +6,7 @@ namespace System.Windows.Controls
 {
     public static class DataGridExtensions
     {
-        public static DataGridCellEdit<T> MangerEdit<T>(this DataGrid dataGrid) where T : class, new()
+        public static DataGridCellEdit<T> BeginEdit<T>(this DataGrid dataGrid) where T : class, new()
         {
             var dataGridCellEdit = new DataGridCellEdit<T>();
             dataGridCellEdit.BeginEdit(dataGrid);
