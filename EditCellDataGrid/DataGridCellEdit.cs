@@ -19,6 +19,7 @@ namespace EditCellDataGrid
         public event DataGridlValueChangedEventHanddler<T> EventDataGridValueChanged;
 
         private object modelSelected;
+        private int SelectedIndex = 0;
         private string fieldName;
 
         private PropertyInfo property;
@@ -83,6 +84,7 @@ namespace EditCellDataGrid
 
             rowSelected = _datagrid.GetSelectedRow();
             cellSelected = _datagrid.GetCell(rowSelected, _datagrid.CurrentColumn.DisplayIndex);
+            SelectedIndex = _datagrid.SelectedIndex;
             property = GetProperty(_datagrid, e);
             column = e.Column as DataGridTextColumn;
 
@@ -172,13 +174,14 @@ namespace EditCellDataGrid
             {
                 EventDataGridValueChanged(this, new DataGridlValueChangedEventArgs<T>()
                 {
-                    Entity = (T)modelSelected,
+                    Model = (T)modelSelected,
                     Column = column,
                     Row = dataGridRow,
                     Cell = dataGridCell,
                     FieldName = fieldName,
                     OldValue = result.OldValue,
-                    NewValue = result.NewValue
+                    NewValue = result.NewValue,
+                    SelectedIndex = SelectedIndex
                 });
             }
         }
