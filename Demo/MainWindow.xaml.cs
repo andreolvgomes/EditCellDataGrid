@@ -39,7 +39,7 @@ namespace EditCellDataGrid
             dgv.ItemsSource = new List<Produto>();
             dgv.ItemsSource = items;
 
-            var dataGridCellEdit = dgv.ManagerEdit<Produto>();
+            var dataGridCellEdit = dgv.ManagerEdit<Produto>(settings: new CellEditSettings() { MoveFocusNextRowAfterConfirmedWithEnter = false });
             dataGridCellEdit.EventDataGridValueChanged += DataGridValueChanged;
 
             sliderFontSize.Value = dgv.FontSize;
@@ -47,7 +47,7 @@ namespace EditCellDataGrid
 
         private void DataGridValueChanged(object sender, DataGridlValueChangedEventArgs<Produto> e)
         {
-            
+
         }
 
         /// <summary>

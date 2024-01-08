@@ -1,14 +1,19 @@
 ﻿using EditCellDataGrid.EventsArgs;
 using EditCellDataGrid.Extensions;
 using EditCellDataGrid.Delegates;
+using EditCellDataGrid.Extenders;
 using System.Windows.Controls;
 using System.Reflection;
 using System.Windows;
 using System;
-using EditCellDataGrid.Extenders;
 
 namespace EditCellDataGrid
 {
+    public class CellEditSettings
+    {
+        public bool MoveFocusNextRowAfterConfirmedWithEnter { get; set; } = true;
+    }
+
     public class DataGridCellEdit<T> where T : class, new()
     {
         public event DataGridlValueChangedEventHanddler<T> EventDataGridValueChanged;
@@ -27,8 +32,14 @@ namespace EditCellDataGrid
         private bool _beginEdit = false;
         private DataGridTextColumn column;
 
-        public void BeginEdit(DataGrid dataGrid, bool defineCellStyle = true)
+        private CellEditSettings _settings = new CellEditSettings();
+
+        public void BeginEdit(DataGrid dataGrid, bool defineCellStyle = true, CellEditSettings settings = null)
         {
+            if (settings == null)
+                settings = new CellEditSettings();
+            _settings = settings;
+
             _datagrid = dataGrid;
             owner = Window.GetWindow(_datagrid);
             owner.Closed += OwnerClosed;
@@ -44,6 +55,11 @@ namespace EditCellDataGrid
 
             dataGrid.BeginningEdit += new EventHandler<DataGridBeginningEditEventArgs>(OnBeginningEdit);
             _beginEdit = true;
+        }
+
+        public void SetSettings(CellEditSettings settings)
+        {
+            _settings = settings;
         }
 
         private void OwnerClosed(object sender, EventArgs e)
@@ -141,8 +157,11 @@ namespace EditCellDataGrid
                         OnEventDataGridValueChanged(rowSelected, cellSelected, result);
                     }
 
-                    if (result.KeyEnterPressed)
-                        _datagrid.MoveNextRow();
+                    if (_settings.MoveFocusNextRowAfterConfirmedWithEnter)
+                    {
+                        if (result.KeyEnterPressed)
+                            _datagrid.MoveNextRow();
+                    }
                 }
             }
         }
