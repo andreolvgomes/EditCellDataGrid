@@ -34,6 +34,27 @@ namespace EditCellDataGrid.Extenders
         public static readonly DependencyProperty CharacterCasingProperty =
             DependencyProperty.Register("CharacterCasing", typeof(CharacterCasing), typeof(TextColumnEdit), new PropertyMetadata(CharacterCasing.Upper));
 
+
+        public string Id
+        {
+            get { return (string)GetValue(IdProperty); }
+            set { SetValue(IdProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Id.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty IdProperty =
+            DependencyProperty.Register("Id", typeof(string), typeof(TextColumnEdit), new PropertyMetadata(""));
+
+
+        public bool NotifyChangeEventDataGrid
+        {
+            get { return (bool)GetValue(NotifyChangeEventDataGridProperty); }
+            set { SetValue(NotifyChangeEventDataGridProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for NotifyChangeEventDataGrid.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty NotifyChangeEventDataGridProperty =
+            DependencyProperty.Register("NotifyChangeEventDataGrid", typeof(bool), typeof(TextColumnEdit), new PropertyMetadata(true));
     }
 
     public class TextColumnEditDecimal : TextColumnEdit

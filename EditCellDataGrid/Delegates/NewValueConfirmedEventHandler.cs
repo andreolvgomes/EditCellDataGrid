@@ -2,5 +2,5 @@
 
 namespace EditCellDataGrid.Delegates
 {
-    public delegate void NewValueConfirmedEventHandler(object sender, EditCellEventArgs result);
+    public delegate void NewValueConfirmedEventHandler(object sender, EditCellEventArgs e);
 }

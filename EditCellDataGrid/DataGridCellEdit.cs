@@ -18,7 +18,7 @@ namespace EditCellDataGrid
     {
         public event DataGridlValueChangedEventHanddler<T> EventDataGridValueChanged;
 
-        private object modelSelected;
+        private object selectedItem;
         private int SelectedIndex = 0;
         private string fieldName;
 
@@ -80,7 +80,7 @@ namespace EditCellDataGrid
             if (_datagrid.CurrentColumn as DataGridTemplateColumn != null)
                 return;
 
-            modelSelected = _datagrid.SelectedItem;
+            selectedItem = _datagrid.SelectedItem;
 
             rowSelected = _datagrid.GetSelectedRow();
             cellSelected = _datagrid.GetCell(rowSelected, _datagrid.CurrentColumn.DisplayIndex);
@@ -125,7 +125,7 @@ namespace EditCellDataGrid
                 var characterCasing = GetCharacterCasing();
                 view = new EditCell(owner, textBlock.Text, value, typeInput, e.Column, property.PropertyType, characterCasing);
                 view.SettingsField(_datagrid, rowSelected, e.Column.Header.ToString());
-                view.SetEntity(modelSelected);
+                view.SetEntity(selectedItem);
 
                 view.MinWidth = cellSelected.ActualWidth;
                 view.DefinePosition(cellSelected);
@@ -153,10 +153,12 @@ namespace EditCellDataGrid
                 {
                     if (result.Changes)
                     {
-                        property.SetValue(modelSelected, Convert.ChangeType(result.NewValue, property.PropertyType));
+                        property.SetValue(selectedItem, Convert.ChangeType(result.NewValue, property.PropertyType));
 
-                        OnNewValueConfirmed(rowSelected, cellSelected, result);
-                        OnEventDataGridValueChanged(rowSelected, cellSelected, result);
+                        OnEventCellValueChanged(rowSelected, cellSelected, result);
+
+                        if (ColNotifyChangeEventDataGrid())
+                            OnEventDataGridValueChanged(rowSelected, cellSelected, result);
                     }
 
                     if (_settings.MoveFocusNextRowAfterConfirmedWithEnter)
@@ -174,7 +176,8 @@ namespace EditCellDataGrid
             {
                 EventDataGridValueChanged(this, new DataGridlValueChangedEventArgs<T>()
                 {
-                    Model = (T)modelSelected,
+                    Id = Id(),
+                    Item = (T)selectedItem,
                     Column = column,
                     Row = dataGridRow,
                     Cell = dataGridCell,
@@ -197,10 +200,15 @@ namespace EditCellDataGrid
             return true;
         }
 
-        public bool OnNewValueConfirmed(DataGridRow dataGridRow, DataGridCell dataGridCell, Result result)
+        public bool OnEventCellValueChanged(DataGridRow dataGridRow, DataGridCell dataGridCell, Result result)
         {
             var eventArgs = new EditCellEventArgs()
             {
+                Id = Id(),
+                Item = selectedItem,
+                SelectedIndex = SelectedIndex,
+                Column = column,
+                FieldName = fieldName,
                 Row = dataGridRow,
                 Cell = dataGridCell,
                 NewValue = result.NewValue,
@@ -228,6 +236,23 @@ namespace EditCellDataGrid
                         eventHandler.Target, new object[] { column, eventArgs });
             }
             return true;
+        }
+
+        private string Id()
+        {
+            var id = "";
+            if (column as TextColumnEdit != null)
+                id = (column as TextColumnEdit).Id;
+            return id;
+        }
+
+        private bool ColNotifyChangeEventDataGrid()
+        {
+            var col = column as TextColumnEdit;
+            if (col == null)
+                return true;
+
+            return col.NotifyChangeEventDataGrid;
         }
 
         /// <summary>

@@ -50,10 +50,11 @@
                 <DataGridTextColumn Header="Descrição" Width="300" Binding="{Binding Description}" IsReadOnly="True"/>
                 <extenders:TextColumnEditDecimal Header="Preço" Binding="{Binding Price, StringFormat={}{0:n5}, ConverterCulture=pt-br}" Decimais="5" Width="100"
                                                  EventCellValueChanged="DataGridTextColumnEditCell_DefineNewValue"/>
-                <extenders:TextColumnEditDecimal Header="Quantity" Binding="{Binding Quantity, StringFormat={}{0:n2}, ConverterCulture=pt-br}" Width="100"/>
+                <extenders:TextColumnEditDecimal Header="Quantity" Binding="{Binding Quantity, StringFormat={}{0:n3}, ConverterCulture=pt-br}" Width="100"
+                                                 Decimais="3"/>
                 <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat={}{0:n2}, ConverterCulture=pt-br}" Width="100"/>
                 <DataGridTextColumn Header="Sem Binding(Error)" Width="100"/>
-                <DataGridTextColumn Header="Data" Binding="{Binding Date, StringFormat={}{0:dd/MM/yyyy}, ConverterCulture=pt-br}" Width="100"/>
+                <extenders:TextColumnEditDate Header="Data" Binding="{Binding Date, StringFormat={}{0:dd/MM/yyyy}, ConverterCulture=pt-br}" Width="100" NotifyChangeEventDataGrid="False"/>
                 <extenders:TextColumnEditMask Header="Mask" Mask="000.000.000-00" Binding="{Binding Cpf}" Width="100"/>
                 <DataGridTextColumn Header="Observação" Width="300" Binding="{Binding Obs}"/>
             </DataGrid.Columns>

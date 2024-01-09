@@ -1,4 +1,5 @@
 ﻿using EditCellDataGrid.Extensions;
+using EditCellDataGrid.Extenders;
 using System.Windows.Input;
 using EditCellDataGrid;
 
@@ -52,6 +53,23 @@ namespace System.Windows.Controls
         public static void SetStyle(this DataGrid datagrid, Style style)
         {
             datagrid.StyleCell(style);
+        }
+
+        public static DataGridColumn ColById(this DataGrid datagrid, string Id)
+        {
+            if (datagrid.Columns.Count == 0) return null;
+
+            for (int i = 0; i < datagrid.Columns.Count; i++)
+            {
+                var dataGridTemplateColumnExtender = datagrid.Columns[i] as TextColumnEdit;
+                if (dataGridTemplateColumnExtender != null)
+                {
+                    if (dataGridTemplateColumnExtender.Id == null) continue;
+                    if (dataGridTemplateColumnExtender.Id.ToUpper().Equals(Id.ToUpper()))
+                        return dataGridTemplateColumnExtender;
+                }
+            }
+            return null;
         }
     }
 }

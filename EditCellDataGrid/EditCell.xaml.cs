@@ -214,19 +214,6 @@ namespace EditCellDataGrid
             }
         }
 
-        public Result Input()
-        {
-            ShowDialog();
-            return new Result()
-            {
-                KeyEnterPressed = pressedEnter,
-                Success = success,
-                NewValue = Field.Text,
-                OldValue = _oldValue.ToString(),
-                Changes = !Field.Text.Equals(_oldValue)
-            };
-        }
-
         public Result Get()
         {
             return new Result()
@@ -235,8 +222,23 @@ namespace EditCellDataGrid
                 Success = success,
                 NewValue = Field.Text,
                 OldValue = _oldValue.ToString(),
-                Changes = !Field.Text.Equals(_oldValue)
+                Changes = CheckChange()
             };
+        }
+
+        private bool CheckChange()
+        {
+            var isDecimals = (Field as TextBoxDecimal) != null;
+            if (isDecimals)
+            {
+                decimal text = 0;
+                decimal old = 0;
+                decimal.TryParse(Field.Text, out text);
+                decimal.TryParse(_oldValue, out old);
+                return !old.Equals(text);
+            }
+
+            return !Field.Text.Equals(_oldValue);
         }
 
         private void textbox_PreviewKeyDown(object sender, KeyEventArgs e)
