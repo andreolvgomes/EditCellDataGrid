@@ -45,13 +45,11 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>-->
-                <extenders:TextColumnEdit Header="Código" Binding="{Binding Id}" EventValidation="DataGridTextColumn_ValidationEdit" MaxLength="5"
-                                          EventF2EventHandler="TextColumnEdit_EventF2EventHandler"/>
+                <extenders:TextColumnEdit Header="Código" Binding="{Binding Id}" EventValidation="DataGridTextColumn_ValidationEdit" MaxLength="5" EventF2EventHandler="TextColumnEdit_EventF2EventHandler"/>
                 <DataGridTextColumn Header="Descrição" Width="300" Binding="{Binding Description}" IsReadOnly="True"/>
-                <extenders:TextColumnEditDecimal Header="Preço" Binding="{Binding Price, StringFormat={}{0:n5}, ConverterCulture=pt-br}" Decimais="5" Width="100"
-                                                 EventCellValueChanged="DataGridTextColumnEditCell_DefineNewValue"/>
-                <extenders:TextColumnEditDecimal Header="Quantity" Binding="{Binding Quantity, StringFormat={}{0:n3}, ConverterCulture=pt-br}" Width="100"
-                                                 Decimais="3"/>
+                <extenders:TextColumnEditDecimal Header="Preço" Binding="{Binding Price, StringFormat={}{0:C}, ConverterCulture=pt-br}" Decimais="5" Width="100" EventCellValueChanged="DataGridTextColumnEditCell_DefineNewValue"/>
+                <extenders:TextColumnEditDecimal Header="Quantity" Binding="{Binding Quantity, StringFormat={}{0:n3}, ConverterCulture=pt-br}" Width="100" Decimais="3"/>
+                <extenders:TextColumnEditDecimal Header="Lucro" Binding="{Binding Lucro, StringFormat={}{0:n2}%, ConverterCulture=pt-br}" Width="100" Decimais="3"/>
                 <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat={}{0:n2}, ConverterCulture=pt-br}" Width="100"/>
                 <DataGridTextColumn Header="Sem Binding(Error)" Width="100"/>
                 <extenders:TextColumnEditDate Header="Data" Binding="{Binding Date, StringFormat={}{0:dd/MM/yyyy}, ConverterCulture=pt-br}" Width="100" NotifyChangeEventDataGrid="False"/>

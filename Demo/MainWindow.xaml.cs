@@ -32,7 +32,8 @@ namespace EditCellDataGrid
                     Total = price * quantity,
                     Date = DateTime.Now.Date,
                     Cpf = "000.000.000-00",
-                    Obs = Guid.NewGuid().ToString()
+                    Obs = Guid.NewGuid().ToString(),
+                    Lucro = 25
                 });
             }
 

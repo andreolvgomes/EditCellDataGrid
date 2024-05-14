@@ -140,6 +140,22 @@ namespace EditCellDataGrid
             }
         }
 
+        private decimal _lucro;
+
+        public decimal Lucro
+        {
+            get { return _lucro; }
+            set
+            {
+                if (_lucro != value)
+                {
+                    _lucro = value;
+                    OnPropertyChanged("Lucro");
+                }
+            }
+        }
+
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void OnPropertyChanged(string propertyName)

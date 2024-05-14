@@ -40,7 +40,7 @@ namespace EditCellDataGrid
         private bool success = false;
 
         private readonly DataGridColumn _column;
-        private readonly string _oldValue;
+        private string _oldValue;
         private readonly Type _propertyType = null;
 
         public EditCell(Window owner, string oldValue, string value, TypeInput typeInput, DataGridColumn column, Type propertyType, CharacterCasing characterCasing)
@@ -53,8 +53,12 @@ namespace EditCellDataGrid
             _oldValue = oldValue;
 
             CrateTextBox(characterCasing);
-            Field.Text = value;
-            
+
+            // remove R$ and %
+            value = RemoveSimbolRealOrPercent(value);
+            Field.Text = RemoveSimbolRealOrPercent(value);
+            _oldValue = RemoveSimbolRealOrPercent(oldValue);
+
             if (characterCasing == CharacterCasing.Upper)
                 Field.Text = value.ToUpper();
             else if (characterCasing == CharacterCasing.Lower)
@@ -68,6 +72,16 @@ namespace EditCellDataGrid
                 Field.DefineFocusSelectAll();
 
             PreviewKeyDown += new KeyEventHandler(W_PreviewKeyDown);
+        }
+
+        private string RemoveSimbolRealOrPercent(string value)
+        {
+            if(Field is TextBoxDecimal)
+            {
+                value = value.Replace("%", "");
+                value = value.Replace("R$", "");
+            }
+            return value;
         }
 
         public void SetEntity(object entity)
