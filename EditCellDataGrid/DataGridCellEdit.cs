@@ -112,6 +112,9 @@ namespace EditCellDataGrid
                 typeInput = TypeInput.MouseDevice;
             }
 
+            if (OnEventCheckCellCanEdit() == false)
+                return;
+
             if (CheckInputWithKeyboardDeviceIsValid(property.PropertyType, value, typeInput) == false)
             {
                 _datagrid.CancelEdit();
@@ -132,6 +135,47 @@ namespace EditCellDataGrid
                 view.Closed += InputClosed;
                 view.Show();
             }
+        }
+
+        private bool OnEventCheckCellCanEdit()
+        {
+            var eventDelegate =  GetEventCheckCellCanEdit();
+            if (eventDelegate == null)
+                return true;
+
+            var eventArgs = new EditCellCanEditEventArgs()
+            {
+                Id = Id(),
+                Item = selectedItem,
+                SelectedIndex = SelectedIndex,
+                Column = column,
+                FieldName = fieldName,
+                Row = rowSelected,
+                Cell = cellSelected,
+            };
+
+            foreach (var eventHandler in eventDelegate.GetInvocationList())
+            {
+                var result = (bool)eventHandler.Method.Invoke(
+                        eventHandler.Target, new object[] { this, eventArgs });
+
+                if (result == false)
+                    return result;
+            }
+
+            return true;
+        }
+
+        private MulticastDelegate GetEventCheckCellCanEdit()
+        {
+            Type type = column.GetType();
+
+            var field = type.GetField("EventCheckCellCanEdit", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (field == null)
+                return null;
+
+            var eventDelegate = field.GetValue(column) as MulticastDelegate;
+            return eventDelegate;
         }
 
         private CharacterCasing GetCharacterCasing()
@@ -220,6 +264,42 @@ namespace EditCellDataGrid
             Type type = column.GetType();
 
             var field = type.GetField("EventCellValueChanged", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (field == null) return false;
+
+            var eventDelegate = field.GetValue(column) as MulticastDelegate;
+            if (eventDelegate == null)
+                return false;
+
+            var events = eventDelegate.GetInvocationList();
+            if (events.Length == 0)
+                return false;
+
+            foreach (var eventHandler in events)
+            {
+                eventHandler.Method.Invoke(
+                        eventHandler.Target, new object[] { column, eventArgs });
+            }
+            return true;
+        }
+
+        public bool OnEventCheckCellCanEdit(DataGridRow dataGridRow, DataGridCell dataGridCell, Result result)
+        {
+            var eventArgs = new EditCellCanEditEventArgs()
+            {
+                Id = Id(),
+                Item = selectedItem,
+                SelectedIndex = SelectedIndex,
+                Column = column,
+                FieldName = fieldName,
+                Row = dataGridRow,
+                Cell = dataGridCell,
+            };
+
+            if (column == null) return false;
+
+            Type type = column.GetType();
+
+            var field = type.GetField("EventCheckCellCanEdit", BindingFlags.NonPublic | BindingFlags.Instance);
             if (field == null) return false;
 
             var eventDelegate = field.GetValue(column) as MulticastDelegate;

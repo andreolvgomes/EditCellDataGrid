@@ -57,12 +57,14 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Delegates\CheckCellCanEditEventHandler.cs" />
     <Compile Include="Delegates\DataGridlValueChangedEventHanddler.cs" />
     <Compile Include="Delegates\EditCellF2EventHandler.cs" />
     <Compile Include="Delegates\EditCellValidationEventHandler.cs" />
     <Compile Include="Delegates\DefineNewValueEventHandler.cs" />
     <Compile Include="DataGridCellEdit.cs" />
     <Compile Include="Delegates\NewValueConfirmedEventHandler.cs" />
+    <Compile Include="EventsArgs\EditCellCanEditEventArgs.cs" />
     <Compile Include="EventsArgs\EditCellEventArgs.cs" />
     <Compile Include="EventsArgs\DataGridlValueChangedEventArgs.cs" />
     <Compile Include="EventsArgs\ValidateEventArgs.cs" />

@@ -45,7 +45,8 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>-->
-                <extenders:TextColumnEdit Header="Código" Binding="{Binding Id}" EventValidation="DataGridTextColumn_ValidationEdit" MaxLength="5" EventF2EventHandler="TextColumnEdit_EventF2EventHandler"/>
+                <extenders:TextColumnEdit Header="Código" Binding="{Binding Id}" EventValidation="DataGridTextColumn_ValidationEdit" MaxLength="5" EventF2EventHandler="TextColumnEdit_EventF2EventHandler"
+                                          EventCheckCellCanEdit="TextColumnEdit_EventCheckCellCanEdit"/>
                 <DataGridTextColumn Header="Descrição" Width="300" Binding="{Binding Description}" IsReadOnly="True"/>
                 <extenders:TextColumnEditDecimal Header="Preço" Binding="{Binding Price, StringFormat={}{0:C}, ConverterCulture=pt-br}" Decimais="5" Width="100" EventCellValueChanged="DataGridTextColumnEditCell_DefineNewValue"/>
                 <extenders:TextColumnEditDecimal Header="Quantity" Binding="{Binding Quantity, StringFormat={}{0:n3}, ConverterCulture=pt-br}" Width="100" Decimais="3"/>

@@ -1,6 +1,5 @@
 ﻿using EditCellDataGrid.Delegates;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows;
 
 namespace EditCellDataGrid.Extenders
@@ -10,6 +9,7 @@ namespace EditCellDataGrid.Extenders
         public event EditCellValidationEventHandler EventValidation;
         public event NewValueConfirmedEventHandler EventCellValueChanged;
         public event EditCellF2EventHandler EventF2EventHandler;
+        public event CheckCellCanEditEventHandler EventCheckCellCanEdit;
 
         public static int MaxLengthDefault = 9999;
 
@@ -62,6 +62,7 @@ namespace EditCellDataGrid.Extenders
         public event EditCellValidationEventHandler EventValidation;
         public event NewValueConfirmedEventHandler EventCellValueChanged;
         public event EditCellF2EventHandler EventF2EventHandler;
+        public event CheckCellCanEditEventHandler EventCheckCellCanEdit;
 
         public int Decimais
         {
@@ -79,6 +80,7 @@ namespace EditCellDataGrid.Extenders
         public event EditCellValidationEventHandler EventValidation;
         public event NewValueConfirmedEventHandler EventCellValueChanged;
         public event EditCellF2EventHandler EventF2EventHandler;
+        public event CheckCellCanEditEventHandler EventCheckCellCanEdit;
     }
 
     public class TextColumnEditInteger : TextColumnEdit
@@ -86,6 +88,7 @@ namespace EditCellDataGrid.Extenders
         public event EditCellValidationEventHandler EventValidation;
         public event NewValueConfirmedEventHandler EventCellValueChanged;
         public event EditCellF2EventHandler EventF2EventHandler;
+        public event CheckCellCanEditEventHandler EventCheckCellCanEdit;
     }
 
     public class TextColumnEditMask : TextColumnEdit
@@ -93,6 +96,7 @@ namespace EditCellDataGrid.Extenders
         public event EditCellValidationEventHandler EventValidation;
         public event NewValueConfirmedEventHandler EventCellValueChanged;
         public event EditCellF2EventHandler EventF2EventHandler;
+        public event CheckCellCanEditEventHandler EventCheckCellCanEdit;
 
         public string Mask
         {

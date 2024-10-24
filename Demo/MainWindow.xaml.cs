@@ -93,5 +93,10 @@ namespace EditCellDataGrid
             MessageBox.Show("Event F2 acionado", "Atenção");
             return string.Empty;
         }
+
+        private bool TextColumnEdit_EventCheckCellCanEdit(object sender, EditCellCanEditEventArgs e)
+        {
+            return (e.Item as Produto).Id % 2 == 0;
+        }
     }
 }
