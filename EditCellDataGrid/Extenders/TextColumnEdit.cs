@@ -73,6 +73,17 @@ namespace EditCellDataGrid.Extenders
         // Using a DependencyProperty as the backing store for Decimais.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty DecimaisProperty =
             DependencyProperty.Register("Decimais", typeof(int), typeof(TextColumnEditDecimal), new PropertyMetadata(2));
+
+
+        public bool AllowNegative
+        {
+            get { return (bool)GetValue(AllowNegativeProperty); }
+            set { SetValue(AllowNegativeProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for AllowNegative.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty AllowNegativeProperty =
+            DependencyProperty.Register("AllowNegative", typeof(bool), typeof(TextColumnEditDecimal), new PropertyMetadata(false));
     }
 
     public class TextColumnEditDate : TextColumnEdit

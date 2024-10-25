@@ -76,7 +76,7 @@ namespace EditCellDataGrid
 
         private string RemoveSimbolRealOrPercent(string value)
         {
-            if(Field is TextBoxDecimal)
+            if (Field is TextBoxDecimal)
             {
                 value = value.Replace("%", "");
                 value = value.Replace("R$", "");
@@ -163,7 +163,7 @@ namespace EditCellDataGrid
         {
             var colDecimal = column as TextColumnEditDecimal;
             if (colDecimal != null)
-                return new TextBoxDecimal() { QuantityDecimais = colDecimal.Decimais };
+                return new TextBoxDecimal() { QuantityDecimais = colDecimal.Decimais, AllowNegative = colDecimal.AllowNegative };
 
             var colDate = column as TextColumnEditDate;
             if (colDate != null)
