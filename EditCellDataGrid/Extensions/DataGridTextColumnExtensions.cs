@@ -26,5 +26,12 @@ namespace EditCellDataGrid.Extensions
 
             return false;
         }
+
+        public static bool IsColDecimal(this DataGridTextColumn col, Type type)
+        {
+            if (col as TextColumnEditDecimal != null)
+                return true;
+            return false;
+        }
     }
 }

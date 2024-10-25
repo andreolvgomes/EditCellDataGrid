@@ -139,7 +139,7 @@ namespace EditCellDataGrid
 
         private bool OnEventCheckCellCanEdit()
         {
-            var eventDelegate =  GetEventCheckCellCanEdit();
+            var eventDelegate = GetEventCheckCellCanEdit();
             if (eventDelegate == null)
                 return true;
 
@@ -237,6 +237,13 @@ namespace EditCellDataGrid
         {
             if (typeInput != TypeInput.KeyboardDevice)
                 return true;
+
+            var textColumnEditDecimal = column as TextColumnEditDecimal;
+            if (textColumnEditDecimal != null && value == "-")
+            {
+                if (textColumnEditDecimal.AllowNegative)
+                    return true;
+            }
 
             if (column.CheckColInputIsNumber(type))
                 return long.TryParse(value, out _);
