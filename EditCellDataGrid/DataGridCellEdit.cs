@@ -17,6 +17,7 @@ namespace EditCellDataGrid
     public class DataGridCellEdit<T> where T : class, new()
     {
         public event DataGridlValueChangedEventHanddler<T> EventDataGridValueChanged;
+        public bool CanCellEdit { get; set; } = true;
 
         private object selectedItem;
         private int SelectedIndex = 0;
@@ -78,6 +79,8 @@ namespace EditCellDataGrid
             e.Cancel = true;
 
             if (_datagrid.CurrentColumn as DataGridTemplateColumn != null)
+                return;
+            if (CanCellEdit == false)
                 return;
 
             selectedItem = _datagrid.SelectedItem;
